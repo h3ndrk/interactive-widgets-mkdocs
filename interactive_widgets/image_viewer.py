@@ -1,0 +1,70 @@
+import bs4
+import mkdocs
+import pathlib
+import re
+import typing
+
+from .widget import Widget
+
+
+class ImageViewerWidget(Widget):
+
+    def __init__(self, config: mkdocs.config.base.Config, url: pathlib.PurePosixPath, soup: bs4.BeautifulSoup, index: int, tag: bs4.element.Tag):
+        super().__init__(config, url, soup, index, tag)
+        self.file = self.tag['file']
+        self.mime = self.tag['mime']
+        try:
+            self.name = self.tag['name']
+            assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
+        except KeyError:
+            self.name = self._hash_inputs(
+                'image-viewer',
+                str(index),
+                self.file,
+                self.mime,
+            )
+
+    def __str__(self) -> str:
+        return f'ImageViewerWidget({self.name})'
+
+    def get_head_appends(self) -> typing.List[bs4.element.Tag]:
+        script_room_connection = self.soup.new_tag('script')
+        script_room_connection['src'] = self._relative('/js/RoomConnection.js')
+
+        script_widget = self.soup.new_tag('script')
+        script_widget['src'] = self._relative('/js/ImageViewerWidget.js')
+
+        return [script_room_connection, script_widget]
+
+    def get_replacement(self) -> bs4.element.Tag:
+        div = self.soup.new_tag('div')
+        div['id'] = f'widget-image-viewer-{self.name}'
+        return div
+
+    def get_body_prepends(self) -> typing.List[bs4.element.Tag]:
+        script = self.soup.new_tag('script')
+        script.append(
+            'const roomConnection = new RoomConnection();',
+        )
+        return [script]
+
+    def get_body_appends(self) -> typing.List[bs4.element.Tag]:
+        script = self.soup.new_tag('script')
+        script.append(
+            f'''roomConnection.subscribe(new ImageViewerWidget(
+                document.getElementById("widget-image-viewer-{self.name}"),
+                roomConnection.getSendMessageCallback("{self.name}"),
+                "{self._sanitize_javascript(self.file)}",
+                "{self._sanitize_javascript(self.mime)}",
+            ));''',
+        )
+        return [script]
+
+    def get_backend_configuration(self) -> dict:
+        return {
+            'type': 'always',
+            'logger_name': f'{self.config["backend_type"].capitalize()}Always',
+            'image': 'inter-md-monitor',
+            'enable_tty': True,
+            'command': ['inter-md-monitor', self.file, '0.1', '5.0'],
+        }
