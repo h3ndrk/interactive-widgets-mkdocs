@@ -29,11 +29,11 @@ class TextEditorWidget(Widget):
         return [
             'RoomConnection.js',
             'TextEditorWidget.js',
-            '/node_modules/codemirror/addon',
-            '/node_modules/codemirror/keymap',
-            '/node_modules/codemirror/lib',
-            '/node_modules/codemirror/mode',
-            '/node_modules/codemirror/theme',
+            'node_modules/codemirror/addon',
+            'node_modules/codemirror/keymap',
+            'node_modules/codemirror/lib',
+            'node_modules/codemirror/mode',
+            'node_modules/codemirror/theme',
         ]
 
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:

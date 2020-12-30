@@ -1,11 +1,13 @@
 import binascii
 import bs4
 import hashlib
+import json
 import mkdocs
 import os
 import pathlib
 import re
 import shlex
+import shutil
 import typing
 
 from .button import ButtonWidget
@@ -30,6 +32,11 @@ class Plugin(mkdocs.plugins.BasePlugin):
         )),
     )
 
+    def on_config(self, config: mkdocs.config.base.Config, *args, **kwargs):
+        config['site_dir_parent'] = pathlib.Path(config['site_dir'])
+        config['site_dir'] = pathlib.Path(config['site_dir']) / 'static'
+        return config
+
     def on_pre_build(self, *args, **kwargs):
         self.backend_configuration = {
             'host': self.config['backend_host'],
@@ -42,6 +49,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
             },
             'pages': {},
         }
+        self.static_files = set()
         # with (pathlib.Path(__file__).parent/'static/test.txt').open()as f:
         #     print(f.read())
 
@@ -98,6 +106,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
                         soup.head.append(tag)
                 self.backend_configuration['pages'][page_url]['executors'][widget.name] = widget.get_backend_configuration(
                 )
+                self.static_files |= set(widget.get_static_files())
 
             return soup.encode_contents(formatter='html5').decode()
 
@@ -105,8 +114,27 @@ class Plugin(mkdocs.plugins.BasePlugin):
         # page_file: mkdocs.structure.files.File = page.file
         # print(page_file)
         # print(html, page, args, kwargs)
+        log.info(f'No widgets in {page}, building as static page')
         return output
 
-    def on_post_build(self, *args, **kwargs):
-        import pprint
-        pprint.pprint(self.backend_configuration)
+    def on_post_build(self, config: mkdocs.config.base.Config, *args, **kwargs):
+        log.info('Writing configuration.json...')
+        with (config['site_dir_parent'] / 'configuration.json').open('w') as f:
+            json.dump(self.backend_configuration, f, indent=2)
+        log.info(f'Copying static files...')
+        for static_file in self.static_files:
+            source_static_file = pathlib.Path(
+                __file__).parent / 'static' / pathlib.Path(static_file)
+            target_static_file = config['site_dir'] / pathlib.Path(static_file)
+            target_static_file.parent.mkdir(parents=True, exist_ok=True)
+            if source_static_file.is_file():
+                shutil.copy(
+                    source_static_file,
+                    target_static_file,
+                )
+            else:
+                shutil.copytree(
+                    source_static_file,
+                    target_static_file,
+                    dirs_exist_ok=True,
+                )

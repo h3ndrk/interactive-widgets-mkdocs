@@ -34,9 +34,9 @@ class TerminalWidget(Widget):
         return [
             'RoomConnection.js',
             'TerminalWidget.js',
-            '/node_modules/xterm/lib',
-            '/node_modules/xterm-addon-fit/lib',
-            '/node_modules/xterm/css',
+            'node_modules/xterm/lib',
+            'node_modules/xterm-addon-fit/lib',
+            'node_modules/xterm/css',
         ]
 
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:
