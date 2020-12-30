@@ -30,12 +30,15 @@ class ButtonWidget(Widget):
     def __str__(self) -> str:
         return f'ButtonWidget({self.name})'
 
+    def get_static_files(self):
+        return ['RoomConnection.js', 'ButtonWidget.js']
+
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/js/RoomConnection.js')
+        script_room_connection['src'] = self._relative('/RoomConnection.js')
 
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/js/ButtonWidget.js')
+        script_widget['src'] = self._relative('/ButtonWidget.js')
 
         return [script_room_connection, script_widget]
 

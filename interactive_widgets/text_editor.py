@@ -25,22 +25,33 @@ class TextEditorWidget(Widget):
     def __str__(self) -> str:
         return f'TextEditorWidget({self.name})'
 
+    def get_static_files(self):
+        return [
+            'RoomConnection.js',
+            'TextEditorWidget.js',
+            '/node_modules/codemirror/addon',
+            '/node_modules/codemirror/keymap',
+            '/node_modules/codemirror/lib',
+            '/node_modules/codemirror/mode',
+            '/node_modules/codemirror/theme',
+        ]
+
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/js/RoomConnection.js')
+        script_room_connection['src'] = self._relative('/RoomConnection.js')
 
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/js/TextEditorWidget.js')
+        script_widget['src'] = self._relative('/TextEditorWidget.js')
 
         script_codemirror = self.soup.new_tag('script')
         script_codemirror['src'] = self._relative(
-            '/js/node_modules/codemirror/lib/codemirror.js',
+            '/node_modules/codemirror/lib/codemirror.js',
         )
 
         style_codemirror = self.soup.new_tag('link')
         style_codemirror['rel'] = 'stylesheet'
         style_codemirror['href'] = self._relative(
-            '/js/node_modules/codemirror/lib/codemirror.css',
+            '/node_modules/codemirror/lib/codemirror.css',
         )
 
         return [

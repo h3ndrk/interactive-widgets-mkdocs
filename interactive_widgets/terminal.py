@@ -30,27 +30,36 @@ class TerminalWidget(Widget):
     def __str__(self) -> str:
         return f'TerminalWidget({self.name})'
 
+    def get_static_files(self):
+        return [
+            'RoomConnection.js',
+            'TerminalWidget.js',
+            '/node_modules/xterm/lib',
+            '/node_modules/xterm-addon-fit/lib',
+            '/node_modules/xterm/css',
+        ]
+
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/js/RoomConnection.js')
+        script_room_connection['src'] = self._relative('/RoomConnection.js')
 
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/js/TerminalWidget.js')
+        script_widget['src'] = self._relative('/TerminalWidget.js')
 
         script_xterm = self.soup.new_tag('script')
         script_xterm['src'] = self._relative(
-            '/js/node_modules/xterm/lib/xterm.js',
+            '/node_modules/xterm/lib/xterm.js',
         )
 
         script_xterm_fit = self.soup.new_tag('script')
         script_xterm_fit['src'] = self._relative(
-            '/js/node_modules/xterm-addon-fit/lib/xterm-addon-fit.js',
+            '/node_modules/xterm-addon-fit/lib/xterm-addon-fit.js',
         )
 
         style_xterm = self.soup.new_tag('link')
         style_xterm['rel'] = 'stylesheet'
         style_xterm['href'] = self._relative(
-            '/js/node_modules/xterm/css/xterm.css',
+            '/node_modules/xterm/css/xterm.css',
         )
 
         return [
