@@ -1,0 +1,17 @@
+{
+  "name": "static",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ButtonWidget.js",
+  "dependencies": {
+    "codemirror": "^5.58.2",
+    "xterm": "^4.9.0",
+    "xterm-addon-fit": "^0.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,4 +1,13 @@
 import setuptools
+import setuptools.command.build_py
+
+
+class NpmInstall(setuptools.command.build_py.build_py):
+
+    def run(self):
+        self.spawn(['npm', 'ci', '--prefix', 'interactive_widgets/static'])
+        super().run()
+
 
 setuptools.setup(
     name='interactive_widgets',
@@ -12,5 +21,9 @@ setuptools.setup(
         'mkdocs.plugins': [
             'interactive_widgets = interactive_widgets.plugin:Plugin',
         ],
+    },
+    include_package_data=True,
+    cmdclass={
+        'build_py': NpmInstall,
     },
 )
