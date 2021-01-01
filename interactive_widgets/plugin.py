@@ -121,7 +121,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
         log.info('Writing configuration.json...')
         with (config['site_dir_parent'] / 'configuration.json').open('w') as f:
             json.dump(self.backend_configuration, f, indent=2)
-        log.info(f'Copying static files...')
+
+        log.info('Copying static files...')
         for static_file in self.static_files:
             source_static_file = pathlib.Path(
                 __file__).parent / 'static' / pathlib.Path(static_file)
@@ -138,3 +139,35 @@ class Plugin(mkdocs.plugins.BasePlugin):
                     target_static_file,
                     dirs_exist_ok=True,
                 )
+
+        # TODO: corner case: only static files
+        log.info('Writing interactive-widgets.conf...')
+        with (config['site_dir_parent'] / 'interactive-widgets.conf').open('w') as f:
+            print('upstream backend {', file=f)
+            print('    server 127.0.0.1;', file=f)
+            print('}', file=f)
+            print('server {', file=f)
+            print('    listen       80;', file=f)
+            print('    server_name  localhost;', file=f)
+            print('    location / {', file=f)
+            print('        root /usr/share/nginx/html;', file=f)
+            print('        index index.html index.htm;', file=f)
+            print('    }', file=f)
+            for page_url in self.backend_configuration['pages'].keys():
+                websocket_url = pathlib.PurePosixPath(page_url) / 'ws'
+                proxy_url = f'http://backend{websocket_url}'
+                print(f'    location = {websocket_url} {{', file=f)
+                print(f'        proxy_pass {proxy_url};', file=f)
+                print('        proxy_http_version 1.1;', file=f)
+                print('        proxy_set_header Upgrade $http_upgrade;', file=f)
+                print('        proxy_set_header Connection "Upgrade";', file=f)
+                print('        proxy_set_header Host $host;', file=f)
+                print('    }', file=f)
+            print('}', file=f)
+
+        log.info('Writing Dockerfile...')
+        with (config['site_dir_parent'] / 'Dockerfile').open('w') as f:
+            print('FROM nginx', file=f)
+            print('RUN rm /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*', file=f)
+            print('COPY interactive-widgets.conf /etc/nginx/conf.d/', file=f)
+            print('COPY static/ /usr/share/nginx/html/', file=f)
