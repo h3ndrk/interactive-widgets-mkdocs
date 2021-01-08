@@ -10,7 +10,7 @@ class NpmInstall(setuptools.command.build_py.build_py):
 
 
 setuptools.setup(
-    name='interactive_widgets',
+    name='interactive_widgets_mkdocs',
     version='0.0.1',
     packages=setuptools.find_packages(),
     install_requires=[
