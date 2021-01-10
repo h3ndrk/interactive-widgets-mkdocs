@@ -30,6 +30,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
             ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
             default='DEBUG',
         )),
+        ('backend_monitor_image', mkdocs.config.config_options.Type(str, default='interactive-widgets-monitor')),
+        ('backend_monitor_command', mkdocs.config.config_options.Type(str, default='interactive-widgets-monitor')),
     )
 
     def on_config(self, config: mkdocs.config.base.Config, *args, **kwargs):

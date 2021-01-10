@@ -67,7 +67,7 @@ class ImageViewerWidget(Widget):
         return {
             'type': 'always',
             'logger_name': f'{self.config["backend_type"].capitalize()}Always',
-            'image': 'inter-md-monitor',
+            'image': self.config['backend_monitor_image'],
             'enable_tty': True,
-            'command': ['inter-md-monitor', self.file, '0.1', '5.0'],
+            'command': [self.config['backend_monitor_command'], self.file, '0.1', '5.0'],
         }
