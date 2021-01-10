@@ -118,8 +118,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
         return output
 
     def on_post_build(self, config: mkdocs.config.base.Config, *args, **kwargs):
-        log.info('Writing configuration.json...')
-        with (config['site_dir_parent'] / 'configuration.json').open('w') as f:
+        log.info('Writing interactive-widgets-backend.json...')
+        with (config['site_dir_parent'] / 'interactive-widgets-backend.json').open('w') as f:
             json.dump(self.backend_configuration, f, indent=2)
 
         log.info('Copying static files...')
@@ -141,8 +141,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 )
 
         # TODO: corner case: only static files
-        log.info('Writing interactive-widgets.conf...')
-        with (config['site_dir_parent'] / 'interactive-widgets.conf').open('w') as f:
+        log.info('Writing interactive-widgets-nginx.conf...')
+        with (config['site_dir_parent'] / 'interactive-widgets-nginx.conf').open('w') as f:
             print('upstream backend {', file=f)
             print('    server interactive-widgets-backend;', file=f)
             print('}', file=f)
@@ -169,21 +169,21 @@ class Plugin(mkdocs.plugins.BasePlugin):
         with (config['site_dir_parent'] / 'Dockerfile').open('w') as f:
             print('FROM nginx', file=f)
             print('RUN rm /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*', file=f)
-            print('COPY interactive-widgets.conf /etc/nginx/conf.d/', file=f)
+            print('COPY interactive-widgets-nginx.conf /etc/nginx/conf.d/', file=f)
             print('COPY static/ /usr/share/nginx/html/', file=f)
 
         log.info('Writing docker-compose.yaml...')
         with (config['site_dir_parent'] / 'docker-compose.yaml').open('w') as f:
             print('version: "3"', file=f)
             print('services:', file=f)
-            print('  interactive-widgets-proxy:', file=f)
-            print('    image: interactive-widgets-proxy', file=f)
+            print('  interactive-widgets-nginx:', file=f)
+            print('    image: interactive-widgets-nginx', file=f)
             print('    build: .', file=f)
             print('    ports:', file=f)
             print('    - "80:80"', file=f)
             print('  interactive-widgets-backend:', file=f)
             print('    image: interactive-widgets-backend', file=f)
             print('    volumes:', file=f)
-            print('      - "./configuration.json:/usr/src/app/configuration.json"', file=f)
+            print('      - "./interactive-widgets-backend.json:/usr/src/app/interactive-widgets-backend.json"', file=f)
             print('      - "/var/run/docker.sock:/var/run/docker.sock"', file=f)
-            print('    command: ["interactive-widgets-backend", "configuration.json"]', file=f)
+            print('    command: ["interactive-widgets-backend", "interactive-widgets-backend.json"]', file=f)
