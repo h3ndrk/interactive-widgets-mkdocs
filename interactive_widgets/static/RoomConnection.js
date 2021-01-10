@@ -11,15 +11,15 @@ class RoomConnection {
     // https://gist.github.com/outbreak/316637cde245160c2579898b21837c1c
     const getRandomSymbol = (symbol) => {
       var array;
-      if (symbol === 'y') {
-        array = ['8', '9', 'a', 'b'];
+      if (symbol === "y") {
+        array = ["8", "9", "a", "b"];
         return array[Math.floor(Math.random() * array.length)];
       }
       array = new Uint8Array(1);
       window.crypto.getRandomValues(array);
       return (array[0] % 16).toString(16);
     }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, getRandomSymbol);
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, getRandomSymbol);
   }
   ensureLocationHash() {
     // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
