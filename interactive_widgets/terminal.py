@@ -28,7 +28,7 @@ class TerminalWidget(Widget):
             )
 
     def __str__(self) -> str:
-        return f'TerminalWidget({self.name})'
+        return f'TerminalWidget(name=\'{self.name}\', image=\'{self.image}\', command=\'{self.command}\', working_directory=\'{self.working_directory}\')'
 
     def get_static_files(self):
         return [

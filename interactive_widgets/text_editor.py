@@ -23,7 +23,7 @@ class TextEditorWidget(Widget):
             )
 
     def __str__(self) -> str:
-        return f'TextEditorWidget({self.name})'
+        return f'TextEditorWidget(name=\'{self.name}\', file=\'{self.file}\')'
 
     def get_static_files(self):
         return [
