@@ -44,13 +44,6 @@ class ImageViewerWidget(Widget):
         div['id'] = f'widget-image-viewer-{self.name}'
         return div
 
-    def get_body_prepends(self) -> typing.List[bs4.element.Tag]:
-        script = self.soup.new_tag('script')
-        script.append(
-            'const roomConnection = new RoomConnection();',
-        )
-        return [script]
-
     def get_body_appends(self) -> typing.List[bs4.element.Tag]:
         script = self.soup.new_tag('script')
         script.append(
