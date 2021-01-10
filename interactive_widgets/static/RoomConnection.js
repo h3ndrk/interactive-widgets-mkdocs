@@ -46,8 +46,13 @@ class RoomConnection {
     return webSocketUrl.toString();
   }
   handleMessage(event) {
-    const message = JSON.parse(event.data);
-    this.subscribers[message.executor].handleMessage(message.message);
+    try {
+      const message = JSON.parse(event.data);
+      this.subscribers[message.executor].handleMessage(message.message);
+    } catch (error) {
+      console.error(error);
+      console.error(message);
+    }
   }
   handleClose(event) {
     console.warn("WEBSOCKET CLOSED!!11elf", event);  // TODO: show in UI
@@ -55,8 +60,8 @@ class RoomConnection {
   handleError(event) {
     console.error("WEBSOCKET ERROR:", event);  // TODO: show in UI
   }
-  subscribe(widget) {
-    this.subscribers[widget.name] = widget;
+  subscribe(name, widget) {
+    this.subscribers[name] = widget;
   }
   sendMessage(message) {
     this.webSocket.send(JSON.stringify(message));

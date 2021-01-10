@@ -76,7 +76,7 @@ class TextEditorWidget(Widget):
     def get_body_appends(self) -> typing.List[bs4.element.Tag]:
         script = self.soup.new_tag('script')
         script.append(
-            f'''roomConnection.subscribe(new TextEditorWidget(
+            f'''roomConnection.subscribe("{self.name}", new TextEditorWidget(
                 document.getElementById("widget-text-editor-{self.name}"),
                 roomConnection.getSendMessageCallback("{self.name}"),
                 "{self._sanitize_javascript(self.file)}",
