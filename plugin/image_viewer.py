@@ -1,3 +1,4 @@
+import binascii
 import bs4
 import mkdocs
 import pathlib
@@ -14,11 +15,12 @@ class ImageViewerWidget(Widget):
         self.file = self.tag['file']
         self.mime = self.tag['mime']
         try:
-            self.name = self.tag['name']
+            self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
             assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
         except KeyError:
             self.name = self._hash_inputs(
                 'image-viewer',
+                str(self.url),
                 str(index),
                 self.file,
                 self.mime,
