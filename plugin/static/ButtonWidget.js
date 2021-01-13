@@ -7,6 +7,7 @@ class ButtonWidget {
     this.setupUi();
   }
   setupUi() {
+    this.element.classList = ["interactive-widgets-button"];
     const buttonElement = document.createElement("button");
     buttonElement.classList.add("button");
     buttonElement.innerText = this.label;
@@ -25,6 +26,10 @@ class ButtonWidget {
     this.outputsElement = document.createElement("div");
     this.outputsElement.classList.add("outputs");
     this.element.appendChild(this.outputsElement);
+    const noOutputElement = document.createElement("div");
+    noOutputElement.classList.add("message");
+    noOutputElement.innerText = "There is no output yet";
+    this.outputsElement.appendChild(noOutputElement);
   }
   handleMessage(message) {
     switch (message.type) {

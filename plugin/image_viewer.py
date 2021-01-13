@@ -30,7 +30,7 @@ class ImageViewerWidget(Widget):
         return f'ImageViewerWidget(name=\'{self.name}\', file=\'{self.file}\', mime=\'{self.mime}\')'
 
     def get_static_files(self):
-        return ['RoomConnection.js', 'ImageViewerWidget.js']
+        return ['RoomConnection.js', 'ImageViewerWidget.js', 'see-no-evil-monkey.png']
 
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')

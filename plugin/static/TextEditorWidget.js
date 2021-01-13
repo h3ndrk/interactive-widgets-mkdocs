@@ -7,14 +7,43 @@ class TextEditorWidget {
     this.setupUi();
   }
   setupUi() {
+    this.element.classList = ["interactive-widgets-text-editor"];
     this.contentsElement = document.createElement("div");
     this.contentsElement.classList.add("contents");
     this.setupError(btoa("There is no data"));
     this.element.appendChild(this.contentsElement);
     this.captionElement = document.createElement("div");
     this.captionElement.classList.add("caption");
-    this.captionElement.innerText = `Editing text contents of ${this.file}`;
+    this.captionElement.innerText = `Editing text of ${this.file}`;
     this.element.appendChild(this.captionElement);
+  }
+  setupButtons(hasError) {
+    const buttonsElement = document.createElement("div");
+    buttonsElement.classList.add("buttons");
+    const buttonCreateElement = document.createElement("button");
+    buttonCreateElement.innerText = "Create/Empty";
+    buttonCreateElement.addEventListener("click", () => {
+      // TODO
+      // this.sendMessage(null);
+    });
+    buttonsElement.appendChild(buttonCreateElement);
+    if (!hasError) {
+      const buttonSaveElement = document.createElement("button");
+      buttonSaveElement.innerText = "Save";
+      buttonSaveElement.addEventListener("click", () => {
+        // TODO
+        // this.sendMessage(null);
+      });
+      buttonsElement.appendChild(buttonSaveElement);
+      const buttonDeleteElement = document.createElement("button");
+      buttonDeleteElement.innerText = "Delete";
+      buttonDeleteElement.addEventListener("click", () => {
+        // TODO
+        // this.sendMessage(null);
+      });
+      buttonsElement.appendChild(buttonDeleteElement);
+    }
+    this.contentsElement.appendChild(buttonsElement);
   }
   setupError(error) {
     while (this.contentsElement.firstChild) {
@@ -24,12 +53,16 @@ class TextEditorWidget {
     this.contentsElement.classList.remove("with-contents");
     this.contentsElement.classList.add("with-error");
 
+    this.setupButtons(true);
+
+    const errorContainerElement = document.createElement("div");
+    errorContainerElement.classList.add("error-container");
     const errorElement = document.createElement("div");
     errorElement.classList.add("error");
-    // const emojiElement = document.createElement("img");
-    // emojiElement.src = "see-no-evil-monkey.png";
-    // emojiElement.alt = "Oops";
-    // errorElement.appendChild(emojiElement);
+    const emojiElement = document.createElement("img");
+    emojiElement.src = "see-no-evil-monkey.png";
+    emojiElement.alt = "Oops";
+    errorElement.appendChild(emojiElement);
     const titleElement = document.createElement("div");
     titleElement.classList.add("title");
     titleElement.innerText = `Cannot view ${this.file}`;
@@ -38,7 +71,8 @@ class TextEditorWidget {
     descriptionElement.classList.add("description");
     descriptionElement.innerText = atob(error);
     errorElement.appendChild(descriptionElement);
-    this.contentsElement.appendChild(errorElement);
+    errorContainerElement.appendChild(errorElement);
+    this.contentsElement.appendChild(errorContainerElement);
   }
   setupContents(contents) {
     while (this.contentsElement.firstChild) {
@@ -47,7 +81,9 @@ class TextEditorWidget {
 
     this.contentsElement.classList.remove("with-error");
     this.contentsElement.classList.add("with-contents");
-    
+
+    this.setupButtons(false);
+
     const editorElement = document.createElement("div");
     editorElement.classList.add("editor");
     this.editor = CodeMirror(editorElement, {

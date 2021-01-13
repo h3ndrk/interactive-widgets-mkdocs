@@ -36,6 +36,7 @@ class TextEditorWidget(Widget):
             'node_modules/codemirror/lib',
             'node_modules/codemirror/mode',
             'node_modules/codemirror/theme',
+            'see-no-evil-monkey.png',
         ]
 
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:

@@ -8,13 +8,14 @@ class ImageViewerWidget {
     this.setupUi();
   }
   setupUi() {
+    this.element.classList = ["interactive-widgets-image-viewer"];
     this.contentsElement = document.createElement("div");
     this.contentsElement.classList.add("contents", "with-error");
     this.setupError(btoa("There is no data"));
     this.element.appendChild(this.contentsElement);
     this.captionElement = document.createElement("div");
     this.captionElement.classList.add("caption");
-    this.captionElement.innerText = `Viewing text contents of ${this.file}`;
+    this.captionElement.innerText = `Viewing image from ${this.file}`;
     this.element.appendChild(this.captionElement);
   }
   setupError(error) {
@@ -28,10 +29,10 @@ class ImageViewerWidget {
     this.contentsElement.style.backgroundImage = "none";
     const errorElement = document.createElement("div");
     errorElement.classList.add("error");
-    // const emojiElement = document.createElement("img");
-    // emojiElement.src = "see-no-evil-monkey.png";
-    // emojiElement.alt = "Oops";
-    // errorElement.appendChild(emojiElement);
+    const emojiElement = document.createElement("img");
+    emojiElement.src = "see-no-evil-monkey.png";
+    emojiElement.alt = "Oops";
+    errorElement.appendChild(emojiElement);
     const titleElement = document.createElement("div");
     titleElement.classList.add("title");
     titleElement.innerText = `Cannot view ${this.file}`;

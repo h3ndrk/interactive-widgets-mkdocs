@@ -6,6 +6,7 @@ class TerminalWidget {
     this.setupUi();
   }
   setupUi() {
+    this.element.classList = ["interactive-widgets-terminal"];
     this.titleElement = document.createElement("div");
     this.titleElement.classList.add("title");
     this.titleElement.innerText = "";

@@ -28,7 +28,7 @@ class TextViewerWidget(Widget):
         return f'TextViewerWidget(name=\'{self.name}\', file=\'{self.file}\')'
 
     def get_static_files(self):
-        return ['RoomConnection.js', 'TextViewerWidget.js']
+        return ['RoomConnection.js', 'TextViewerWidget.js', 'see-no-evil-monkey.png']
 
     def get_head_appends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
