@@ -97,13 +97,13 @@ class Plugin(mkdocs.plugins.BasePlugin):
             for widget in widgets:
                 log.info(f'Processing {widget}...')
                 widget.tag.replace_with(widget.get_replacement())
-                for tag in widget.get_head_prepends():
+                for tag in reversed(widget.get_head_prepends()):
                     if tag not in soup.head:
                         soup.head.insert(0, tag)
                 for tag in widget.get_head_appends():
                     if tag not in soup.head:
                         soup.head.append(tag)
-                for tag in widget.get_body_prepends():
+                for tag in reversed(widget.get_body_prepends()):
                     if tag not in soup.body:
                         soup.body.insert(0, tag)
                 for tag in widget.get_body_appends():

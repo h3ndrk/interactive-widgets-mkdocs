@@ -57,9 +57,15 @@ class Widget:
         ''')
         return [script]
 
+    def get_head_appends(self) -> typing.List[bs4.element.Tag]:
+        return []
+
     def get_body_prepends(self) -> typing.List[bs4.element.Tag]:
         script = self.soup.new_tag('script')
         script.append(
             'const roomConnection = new RoomConnection(currentRoomName);',
         )
         return [script]
+
+    def get_body_appends(self) -> typing.List[bs4.element.Tag]:
+        return []

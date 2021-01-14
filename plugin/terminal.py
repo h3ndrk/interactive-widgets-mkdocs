@@ -41,7 +41,7 @@ class TerminalWidget(Widget):
             'node_modules/xterm/css',
         ]
 
-    def get_head_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
         script_room_connection['src'] = self._relative('/RoomConnection.js')
 
@@ -64,7 +64,7 @@ class TerminalWidget(Widget):
             '/node_modules/xterm/css/xterm.css',
         )
 
-        return [
+        return super().get_head_prepends() + [
             script_room_connection,
             script_widget,
             script_xterm,

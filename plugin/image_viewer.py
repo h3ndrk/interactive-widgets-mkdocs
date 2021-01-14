@@ -32,14 +32,17 @@ class ImageViewerWidget(Widget):
     def get_static_files(self):
         return ['RoomConnection.js', 'ImageViewerWidget.js', 'see-no-evil-monkey.png']
 
-    def get_head_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
         script_room_connection['src'] = self._relative('/RoomConnection.js')
 
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/ImageViewerWidget.js')
 
-        return [script_room_connection, script_widget]
+        return super().get_head_prepends() + [
+            script_room_connection,
+            script_widget,
+        ]
 
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')

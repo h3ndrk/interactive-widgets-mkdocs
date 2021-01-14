@@ -39,7 +39,7 @@ class TextEditorWidget(Widget):
             'see-no-evil-monkey.png',
         ]
 
-    def get_head_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
         script_room_connection['src'] = self._relative('/RoomConnection.js')
 
@@ -57,7 +57,7 @@ class TextEditorWidget(Widget):
             '/node_modules/codemirror/lib/codemirror.css',
         )
 
-        return [
+        return super().get_head_prepends() + [
             script_room_connection,
             script_widget,
             script_codemirror,
