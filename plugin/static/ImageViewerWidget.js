@@ -52,7 +52,6 @@ class ImageViewerWidget {
     this.contentsElement.classList.add("with-contents");
 
     this.contentsElement.style.backgroundImage = `url(data:${this.mime};base64,${contents})`;
-    this.contentsElement.style.height = "200px";
   }
   handleMessage(message) {
     if (message.type != "output") {
