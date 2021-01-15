@@ -63,6 +63,5 @@ class TextViewerWidget(Widget):
             'type': 'always',
             'logger_name': f'{self.config["backend_type"].capitalize()}Always',
             'image': self.config['backend_monitor_image'],
-            'enable_tty': True,
             'command': [self.config['backend_monitor_command'], self.file, '0.1', '5.0'],
         }
