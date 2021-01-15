@@ -16,8 +16,11 @@ class TextEditorWidget {
     const buttonCreateElement = document.createElement("button");
     buttonCreateElement.innerText = "Create/Empty";
     buttonCreateElement.addEventListener("click", () => {
-      // TODO
-      // this.sendMessage(null);
+      this.sendMessage({
+        stdin: btoa(JSON.stringify({
+          contents: "",
+        }) + "\n"),
+    });
     });
     buttonsElement.appendChild(buttonCreateElement);
     const spacerBetweenCreateAndSaveElement = document.createElement("div");
@@ -27,8 +30,11 @@ class TextEditorWidget {
     buttonSaveElement.classList.add("hide-on-error");
     buttonSaveElement.innerText = "Save";
     buttonSaveElement.addEventListener("click", () => {
-      // TODO
-      // this.sendMessage(null);
+      this.sendMessage({
+        stdin: btoa(JSON.stringify({
+          contents: btoa(this.editor.getValue()),
+        }) + "\n"),
+    });
     });
     buttonsElement.appendChild(buttonSaveElement);
     const spacerBetweenSaveAndDeleteElement = document.createElement("div");
@@ -38,8 +44,11 @@ class TextEditorWidget {
     buttonDeleteElement.classList.add("hide-on-error");
     buttonDeleteElement.innerText = "Delete";
     buttonDeleteElement.addEventListener("click", () => {
-      // TODO
-      // this.sendMessage(null);
+      this.sendMessage({
+        stdin: btoa(JSON.stringify({
+          delete: true,
+        }) + "\n"),
+      });
     });
     buttonsElement.appendChild(buttonDeleteElement);
     this.contentsElement.appendChild(buttonsElement);
