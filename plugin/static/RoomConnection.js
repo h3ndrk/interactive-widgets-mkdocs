@@ -28,7 +28,7 @@ class RoomConnection {
       this.subscribers[message.executor].handleMessage(message.message);
     } catch (error) {
       console.error(error);
-      console.error(message);
+      console.error(event.data);
     }
   }
   handleClose(event) {
