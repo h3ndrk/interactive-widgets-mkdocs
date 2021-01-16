@@ -70,9 +70,6 @@ class Plugin(mkdocs.plugins.BasePlugin):
         )
         soup = bs4.BeautifulSoup(output, 'html.parser')
 
-        print(list(soup.head.children))
-        print([tag.string.strip() == 'interactive-widgets' for tag in soup.find_all(string=lambda text: isinstance(text, bs4.Comment)) ])
-
         widgets = [
             {
                 'x-button': ButtonWidget,
