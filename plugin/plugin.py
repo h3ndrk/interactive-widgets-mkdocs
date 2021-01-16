@@ -23,6 +23,7 @@ log = mkdocs.plugins.log.getChild('interactive-widgets')
 class Plugin(mkdocs.plugins.BasePlugin):
 
     config_scheme = (
+        ('nginx_port', mkdocs.config.config_options.Type(int, default=80)),
         ('backend_host', mkdocs.config.config_options.Type(str, default='*')),
         ('backend_port', mkdocs.config.config_options.Type(int, default=80)),
         ('backend_type', mkdocs.config.config_options.Type(str, default='docker')),
@@ -30,8 +31,18 @@ class Plugin(mkdocs.plugins.BasePlugin):
             ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
             default='DEBUG',
         )),
-        ('backend_monitor_image', mkdocs.config.config_options.Type(str, default='interactive-widgets-monitor')),
-        ('backend_monitor_command', mkdocs.config.config_options.Type(str, default='interactive-widgets-monitor')),
+        ('backend_monitor_image', mkdocs.config.config_options.Type(
+            str,
+            default='interactive-widgets-monitor',
+        )),
+        ('backend_monitor_command', mkdocs.config.config_options.Type(
+            str,
+            default='interactive-widgets-monitor',
+        )),
+        ('backend_monitor_default_success_timeout',
+         mkdocs.config.config_options.Type(float, default=0.1)),
+        ('backend_monitor_default_failure_timeout',
+         mkdocs.config.config_options.Type(float, default=5.0)),
     )
 
     def on_config(self, config: mkdocs.config.base.Config, *args, **kwargs):
@@ -126,7 +137,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
             for static_file in self.static_files:
                 source_static_file = pathlib.Path(
                     __file__).parent / 'static' / pathlib.Path(static_file)
-                target_static_file = config['site_dir'] / pathlib.Path(static_file)
+                target_static_file = config['site_dir'] / \
+                    pathlib.Path(static_file)
                 target_static_file.parent.mkdir(parents=True, exist_ok=True)
                 if source_static_file.is_file():
                     shutil.copy(
@@ -168,7 +180,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
             log.info('Writing Dockerfile...')
             with (config['site_dir_parent'] / 'Dockerfile').open('w') as f:
                 print('FROM nginx', file=f)
-                print('RUN rm /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*', file=f)
+                print(
+                    'RUN rm /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*', file=f)
                 print('COPY interactive-widgets-nginx.conf /etc/nginx/conf.d/', file=f)
                 print('COPY static/ /usr/share/nginx/html/', file=f)
 
@@ -180,10 +193,12 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 print('    image: interactive-widgets-nginx', file=f)
                 print('    build: .', file=f)
                 print('    ports:', file=f)
-                print('    - "80:80"', file=f)
+                print(f'    - "{self.config["nginx_port"]}:80"', file=f)
                 print('  interactive-widgets-backend:', file=f)
                 print('    image: interactive-widgets-backend', file=f)
                 print('    volumes:', file=f)
-                print('      - "./interactive-widgets-backend.json:/usr/src/app/interactive-widgets-backend.json"', file=f)
+                print(
+                    '      - "./interactive-widgets-backend.json:/usr/src/app/interactive-widgets-backend.json"', file=f)
                 print('      - "/var/run/docker.sock:/var/run/docker.sock"', file=f)
-                print('    command: ["interactive-widgets-backend", "interactive-widgets-backend.json"]', file=f)
+                print(
+                    '    command: ["interactive-widgets-backend", "interactive-widgets-backend.json"]', file=f)

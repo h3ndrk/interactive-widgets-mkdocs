@@ -13,6 +13,14 @@ class TextEditorWidget(Widget):
     def __init__(self, config: mkdocs.config.base.Config, url: pathlib.PurePosixPath, soup: bs4.BeautifulSoup, index: int, tag: bs4.element.Tag):
         super().__init__(config, url, soup, index, tag)
         self.file = self.tag['file']
+        self.success_timeout = self.tag.get(
+            'success-timeout',
+            str(self.config['backend_monitor_default_success_timeout']),
+        )
+        self.failure_timeout = self.tag.get(
+            'failure-timeout',
+            str(self.config['backend_monitor_default_failure_timeout']),
+        )
         try:
             self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
             assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
@@ -85,5 +93,10 @@ class TextEditorWidget(Widget):
             'type': 'always',
             'logger_name': f'{self.config["backend_type"].capitalize()}Always',
             'image': self.config['backend_monitor_image'],
-            'command': [self.config['backend_monitor_command'], self.file, '0.1', '5.0'],
+            'command': [
+                self.config['backend_monitor_command'],
+                self.file,
+                self.success_timeout,
+                self.failure_timeout,
+            ],
         }
