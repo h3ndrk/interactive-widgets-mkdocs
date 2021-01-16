@@ -4,6 +4,7 @@ class ButtonWidget {
     this.sendMessage = sendMessage;
     this.command = command;
     this.label = label;
+    this.open = false;
     this.setupUi();
   }
   setupUi() {
@@ -12,7 +13,9 @@ class ButtonWidget {
     buttonElement.classList.add("button");
     buttonElement.innerText = this.label;
     buttonElement.addEventListener("click", () => {
-      this.sendMessage(null);
+      if (this.open) {
+        this.sendMessage(null);
+      }
     });
     this.element.appendChild(buttonElement);
     const commandElement = document.createElement("div");
@@ -30,6 +33,14 @@ class ButtonWidget {
     noOutputElement.classList.add("message");
     noOutputElement.innerText = "There is no output yet";
     this.outputsElement.appendChild(noOutputElement);
+  }
+  handleOpen() {
+    this.open = true;
+    this.element.classList.add("open");
+  }
+  handleClose() {
+    this.open = false;
+    this.element.classList.remove("open");
   }
   handleMessage(message) {
     switch (message.type) {

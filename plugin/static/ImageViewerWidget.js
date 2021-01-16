@@ -5,6 +5,7 @@ class ImageViewerWidget {
     this.file = file;
     this.mime = mime;
     this.stdoutBuffer = "";
+    this.open = false;
     this.setupUi();
   }
   setupUi() {
@@ -52,6 +53,14 @@ class ImageViewerWidget {
     this.contentsElement.classList.add("with-contents");
 
     this.contentsElement.style.backgroundImage = `url(data:${this.mime};base64,${contents})`;
+  }
+  handleOpen() {
+    this.open = true;
+    this.element.classList.add("open");
+  }
+  handleClose() {
+    this.open = false;
+    this.element.classList.remove("open");
   }
   handleMessage(message) {
     if (message.type != "output") {

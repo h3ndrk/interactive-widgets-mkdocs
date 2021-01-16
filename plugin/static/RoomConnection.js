@@ -2,7 +2,9 @@ class RoomConnection {
   constructor(roomName) {
     this.roomName = roomName;
     this.subscribers = {};
+    this.messageQueue = [];
     this.webSocket = new WebSocket(this.getWebSocketUrl());
+    this.webSocket.addEventListener("open", this.handleOpen.bind(this));
     this.webSocket.addEventListener("message", this.handleMessage.bind(this));
     this.webSocket.addEventListener("close", this.handleClose.bind(this));
     this.webSocket.addEventListener("error", this.handleError.bind(this));
@@ -22,6 +24,11 @@ class RoomConnection {
     webSocketUrl.search = webSocketUrlParams;
     return webSocketUrl.toString();
   }
+  handleOpen() {
+    for (const widget of Object.values(this.subscribers)) {
+      widget.handleOpen();
+    }
+  }
   handleMessage(event) {
     try {
       const message = JSON.parse(event.data);
@@ -33,9 +40,15 @@ class RoomConnection {
   }
   handleClose(event) {
     console.warn("WEBSOCKET CLOSED!!11elf", event);  // TODO: show in UI
+    for (const widget of Object.values(this.subscribers)) {
+      widget.handleClose();
+    }
   }
   handleError(event) {
     console.error("WEBSOCKET ERROR:", event);  // TODO: show in UI
+    for (const widget of Object.values(this.subscribers)) {
+      widget.handleClose();
+    }
   }
   subscribe(name, widget) {
     this.subscribers[name] = widget;

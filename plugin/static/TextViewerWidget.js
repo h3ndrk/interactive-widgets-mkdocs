@@ -4,6 +4,7 @@ class TextViewerWidget {
     this.sendMessage = sendMessage;
     this.file = file;
     this.stdoutBuffer = "";
+    this.open = false;
     this.setupUi();
   }
   setupUi() {
@@ -59,6 +60,14 @@ class TextViewerWidget {
       lineElement.innerText = line;
       this.contentsElement.appendChild(lineElement);
     }
+  }
+  handleOpen() {
+    this.open = true;
+    this.element.classList.add("open");
+  }
+  handleClose() {
+    this.open = false;
+    this.element.classList.remove("open");
   }
   handleMessage(message) {
     if (message.type != "output") {

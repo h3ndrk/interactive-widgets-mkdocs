@@ -4,6 +4,7 @@ class TextEditorWidget {
     this.sendMessage = sendMessage;
     this.file = file;
     this.stdoutBuffer = "";
+    this.open = false;
     this.setupUi();
   }
   setupUi() {
@@ -16,11 +17,13 @@ class TextEditorWidget {
     const buttonCreateElement = document.createElement("button");
     buttonCreateElement.innerText = "Create/Empty";
     buttonCreateElement.addEventListener("click", () => {
-      this.sendMessage({
-        stdin: btoa(JSON.stringify({
-          contents: "",
-        }) + "\n"),
-    });
+      if (this.open) {
+        this.sendMessage({
+          stdin: btoa(JSON.stringify({
+            contents: "",
+          }) + "\n"),
+        });
+      }
     });
     buttonsElement.appendChild(buttonCreateElement);
     const spacerBetweenCreateAndSaveElement = document.createElement("div");
@@ -30,11 +33,13 @@ class TextEditorWidget {
     buttonSaveElement.classList.add("hide-on-error");
     buttonSaveElement.innerText = "Save";
     buttonSaveElement.addEventListener("click", () => {
-      this.sendMessage({
-        stdin: btoa(JSON.stringify({
-          contents: btoa(this.editor.getValue()),
-        }) + "\n"),
-    });
+      if (this.open) {
+        this.sendMessage({
+          stdin: btoa(JSON.stringify({
+            contents: btoa(this.editor.getValue()),
+          }) + "\n"),
+        });
+      }
     });
     buttonsElement.appendChild(buttonSaveElement);
     const spacerBetweenSaveAndDeleteElement = document.createElement("div");
@@ -44,11 +49,13 @@ class TextEditorWidget {
     buttonDeleteElement.classList.add("hide-on-error");
     buttonDeleteElement.innerText = "Delete";
     buttonDeleteElement.addEventListener("click", () => {
-      this.sendMessage({
-        stdin: btoa(JSON.stringify({
-          delete: true,
-        }) + "\n"),
-      });
+      if (this.open) {
+        this.sendMessage({
+          stdin: btoa(JSON.stringify({
+            delete: true,
+          }) + "\n"),
+        })
+      };
     });
     buttonsElement.appendChild(buttonDeleteElement);
     this.contentsElement.appendChild(buttonsElement);
@@ -100,6 +107,14 @@ class TextEditorWidget {
 
     this.editor.setValue(atob(contents));
     this.editor.refresh();
+  }
+  handleOpen() {
+    this.open = true;
+    this.element.classList.add("open");
+  }
+  handleClose() {
+    this.open = false;
+    this.element.classList.remove("open");
   }
   handleMessage(message) {
     if (message.type != "output") {

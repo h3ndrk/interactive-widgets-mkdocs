@@ -3,6 +3,8 @@ class TerminalWidget {
     this.element = element;
     this.sendMessage = sendMessage;
     this.workingDirectory = workingDirectory;
+    this.open = false;
+    this.size = null;
     this.setupUi();
   }
   setupUi() {
@@ -48,23 +50,41 @@ class TerminalWidget {
     this.terminal.loadAddon(this.fitAddon);
     this.terminal.open(this.terminalElement);
     this.terminal.onData(data => {
-      this.sendMessage({
-        stdin: btoa(data),
-      });
+      if (this.open) {
+        this.sendMessage({
+          stdin: btoa(data),
+        });
+      }
     });
     this.terminal.onTitleChange(title => {
       this.titleElement.innerText = `Terminal: ${title}`;
     });
     this.terminal.onResize(size => {
-      console.log('TODO');
-      // this.sendMessage({
-      //   size: size,
-      // });
+      console.log(size);
+      this.size = size;
+      if (this.open) {
+        this.sendMessage({
+          size: size,
+        });
+      }
     });
     this.fitAddon.fit();
     window.addEventListener('resize', () => {
       this.fitAddon.fit();
     });
+  }
+  handleOpen() {
+    this.open = true;
+    this.element.classList.add("open");
+    if (this.size !== null) {
+      this.sendMessage({
+        size: this.size,
+      });
+    }
+  }
+  handleClose() {
+    this.open = false;
+    this.element.classList.remove("open");
   }
   handleMessage(message) {
     this.terminal.write(atob(message.stdout));
