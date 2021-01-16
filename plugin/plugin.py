@@ -70,6 +70,9 @@ class Plugin(mkdocs.plugins.BasePlugin):
         )
         soup = bs4.BeautifulSoup(output, 'html.parser')
 
+        print(list(soup.head.children))
+        print([tag.string.strip() == 'interactive-widgets' for tag in soup.find_all(string=lambda text: isinstance(text, bs4.Comment)) ])
+
         widgets = [
             {
                 'x-button': ButtonWidget,
@@ -106,12 +109,14 @@ class Plugin(mkdocs.plugins.BasePlugin):
             for widget in widgets:
                 log.info(f'Processing {widget}...')
                 widget.tag.replace_with(widget.get_replacement())
-                for tag in reversed(widget.get_head_prepends()):
+                head_comment = soup.find(string=lambda text: isinstance(text, bs4.Comment) and text.string.strip() == 'interactive-widgets')
+                assert head_comment is not None
+                for tag in widget.get_head_prepends():
                     if tag not in soup.head:
-                        soup.head.insert(0, tag)
+                        head_comment.insert_before(tag)
                 for tag in widget.get_head_appends():
                     if tag not in soup.head:
-                        soup.head.append(tag)
+                        head_comment.insert_before(tag)
                 for tag in reversed(widget.get_body_prepends()):
                     if tag not in soup.body:
                         soup.body.insert(0, tag)
