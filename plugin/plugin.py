@@ -152,7 +152,6 @@ class Plugin(mkdocs.plugins.BasePlugin):
                         dirs_exist_ok=True,
                     )
 
-            # TODO: corner case: only static files
             log.info('Writing interactive-widgets-nginx.conf...')
             with (config['site_dir_parent'] / 'interactive-widgets-nginx.conf').open('w') as f:
                 print('upstream backend {', file=f)
