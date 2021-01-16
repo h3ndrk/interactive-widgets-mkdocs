@@ -60,7 +60,6 @@ class TerminalWidget {
       this.titleElement.innerText = `Terminal: ${title}`;
     });
     this.terminal.onResize(size => {
-      console.log(size);
       this.size = size;
       if (this.open) {
         this.sendMessage({
