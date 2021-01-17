@@ -32,6 +32,8 @@ class ImageViewerWidget(Widget):
                 str(index),
                 self.file,
                 self.mime,
+                self.success_timeout,
+                self.failure_timeout,
             )
 
     def __str__(self) -> str:

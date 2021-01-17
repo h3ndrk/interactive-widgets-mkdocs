@@ -30,6 +30,8 @@ class TextEditorWidget(Widget):
                 str(self.url),
                 str(index),
                 self.file,
+                self.success_timeout,
+                self.failure_timeout,
             )
 
     def __str__(self) -> str:
