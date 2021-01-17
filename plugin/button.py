@@ -13,9 +13,11 @@ class ButtonWidget(Widget):
 
     def __init__(self, config: mkdocs.config.base.Config, url: pathlib.PurePosixPath, soup: bs4.BeautifulSoup, index: int, tag: bs4.element.Tag):
         super().__init__(config, url, soup, index, tag)
+        # TODO: working directory
         self.command = self.tag['command']
         self.image = self.tag['image']
         self.label = self.tag['label']
+        self.working_directory = self.tag['working-directory']
         try:
             self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
             assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
@@ -27,6 +29,7 @@ class ButtonWidget(Widget):
                 self.command,
                 self.image,
                 self.label,
+                self.working_directory,
             )
 
     def __str__(self) -> str:
@@ -69,5 +72,6 @@ class ButtonWidget(Widget):
             'type': 'once',
             'logger_name': f'{self.config["backend_type"].capitalize()}Once',
             'image': self.image,
+            'working_directory': self.working_directory,
             'command': shlex.split(self.command),
         }

@@ -93,6 +93,7 @@ class TerminalWidget(Widget):
             'type': 'always',
             'logger_name': f'{self.config["backend_type"].capitalize()}Always',
             'image': self.image,
+            'working_directory': self.working_directory,
             'enable_tty': True,
             'command': shlex.split(self.command),
         }
