@@ -32,7 +32,7 @@ class TextViewerWidget(Widget):
         return f'TextViewerWidget(name={repr(self.name)}, file={repr(self.file)})'
 
     def get_static_files(self):
-        return ['RoomConnection.js', 'TextViewerWidget.js', 'see-no-evil-monkey.png']
+        return ['RoomConnection.js', 'TextViewerWidget.js']
 
     def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
