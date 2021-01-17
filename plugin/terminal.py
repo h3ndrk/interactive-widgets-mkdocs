@@ -1,8 +1,6 @@
-import binascii
 import bs4
 import mkdocs
 import pathlib
-import re
 import shlex
 import typing
 
@@ -16,18 +14,14 @@ class TerminalWidget(Widget):
         self.image = self.tag['image']
         self.command = self.tag['command']
         self.working_directory = self.tag.get('working-directory', None)
-        try:
-            self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
-            assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
-        except KeyError:
-            self.name = self._hash_inputs(
-                'terminal',
-                str(self.url),
-                str(index),
-                self.image,
-                self.command,
-                self.working_directory if self.working_directory is not None else '',
-            )
+        self.name = self._hash_inputs(
+            'terminal',
+            str(self.url),
+            str(index),
+            self.image,
+            self.command,
+            self.working_directory if self.working_directory is not None else '',
+        )
 
     def __str__(self) -> str:
         return f'TerminalWidget(name=\'{self.name}\', image=\'{self.image}\', command=\'{self.command}\', working_directory=\'{self.working_directory if self.working_directory is not None else ""}\')'

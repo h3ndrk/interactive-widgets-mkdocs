@@ -1,8 +1,6 @@
-import binascii
 import bs4
 import mkdocs
 import pathlib
-import re
 import typing
 
 from .widget import Widget
@@ -21,18 +19,14 @@ class TextViewerWidget(Widget):
             'failure-timeout',
             str(self.config['backend_monitor_default_failure_timeout']),
         )
-        try:
-            self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
-            assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
-        except KeyError:
-            self.name = self._hash_inputs(
-                'text-viewer',
-                str(self.url),
-                str(index),
-                self.file,
-                self.success_timeout,
-                self.failure_timeout,
-            )
+        self.name = self._hash_inputs(
+            'text-viewer',
+            str(self.url),
+            str(index),
+            self.file,
+            self.success_timeout,
+            self.failure_timeout,
+        )
 
     def __str__(self) -> str:
         return f'TextViewerWidget(name=\'{self.name}\', file=\'{self.file}\')'
