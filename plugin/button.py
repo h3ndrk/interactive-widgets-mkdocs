@@ -16,7 +16,7 @@ class ButtonWidget(Widget):
         self.command = self.tag['command']
         self.image = self.tag['image']
         self.label = self.tag['label']
-        self.working_directory = self.tag['working-directory']
+        self.working_directory = self.tag.get('working-directory', None)
         try:
             self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
             assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
@@ -28,11 +28,11 @@ class ButtonWidget(Widget):
                 self.command,
                 self.image,
                 self.label,
-                self.working_directory,
+                self.working_directory if self.working_directory is not None else '',
             )
 
     def __str__(self) -> str:
-        return f'ButtonWidget(name=\'{self.name}\', command=\'{self.command}\', image=\'{self.image}\', label=\'{self.label}\')'
+        return f'ButtonWidget(name=\'{self.name}\', command=\'{self.command}\', image=\'{self.image}\', label=\'{self.label}\', working_directory=\'{self.working_directory if self.working_directory is not None else ""}\')'
 
     def get_static_files(self):
         return ['RoomConnection.js', 'ButtonWidget.js']
@@ -67,10 +67,12 @@ class ButtonWidget(Widget):
         return [script]
 
     def get_backend_configuration(self) -> dict:
-        return {
+        configuration = {
             'type': 'once',
             'logger_name': f'{self.config["backend_type"].capitalize()}Once',
             'image': self.image,
-            'working_directory': self.working_directory,
             'command': shlex.split(self.command),
         }
+        if self.working_directory is not None:
+            configuration['working_directory'] = self.working_directory
+        return configuration

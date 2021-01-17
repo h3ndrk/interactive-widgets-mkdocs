@@ -15,7 +15,7 @@ class TerminalWidget(Widget):
         super().__init__(config, url, soup, index, tag)
         self.image = self.tag['image']
         self.command = self.tag['command']
-        self.working_directory = self.tag['working-directory']
+        self.working_directory = self.tag.get('working-directory', None)
         try:
             self.name = f'{binascii.hexlify(str(self.url).encode("utf-8")).decode("utf-8")}-{self.tag["name"]}'
             assert re.fullmatch(r'[0-9a-z\-]+', self.name) is not None
@@ -26,11 +26,11 @@ class TerminalWidget(Widget):
                 str(index),
                 self.image,
                 self.command,
-                self.working_directory,
+                self.working_directory if self.working_directory is not None else '',
             )
 
     def __str__(self) -> str:
-        return f'TerminalWidget(name=\'{self.name}\', image=\'{self.image}\', command=\'{self.command}\', working_directory=\'{self.working_directory}\')'
+        return f'TerminalWidget(name=\'{self.name}\', image=\'{self.image}\', command=\'{self.command}\', working_directory=\'{self.working_directory if self.working_directory is not None else ""}\')'
 
     def get_static_files(self):
         return [
@@ -89,11 +89,13 @@ class TerminalWidget(Widget):
         return [script]
 
     def get_backend_configuration(self) -> dict:
-        return {
+        configuration = {
             'type': 'always',
             'logger_name': f'{self.config["backend_type"].capitalize()}Always',
             'image': self.image,
-            'working_directory': self.working_directory,
             'enable_tty': True,
             'command': shlex.split(self.command),
         }
+        if self.working_directory is not None:
+            configuration['working_directory'] = self.working_directory
+        return configuration
