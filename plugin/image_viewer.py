@@ -31,7 +31,7 @@ class ImageViewerWidget(Widget):
         )
 
     def __str__(self) -> str:
-        return f'ImageViewerWidget(name=\'{self.name}\', file=\'{self.file}\', mime=\'{self.mime}\')'
+        return f'ImageViewerWidget(name={repr(self.name)}, file={repr(self.file)}, mime={repr(self.mime)})'
 
     def get_static_files(self):
         return ['RoomConnection.js', 'ImageViewerWidget.js', 'see-no-evil-monkey.png']

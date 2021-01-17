@@ -26,7 +26,7 @@ class ButtonWidget(Widget):
         )
 
     def __str__(self) -> str:
-        return f'ButtonWidget(name=\'{self.name}\', command=\'{self.command}\', image=\'{self.image}\', label=\'{self.label}\', working_directory=\'{self.working_directory if self.working_directory is not None else ""}\')'
+        return f'ButtonWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, label={repr(self.label)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
         return ['RoomConnection.js', 'ButtonWidget.js']

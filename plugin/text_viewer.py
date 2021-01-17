@@ -29,7 +29,7 @@ class TextViewerWidget(Widget):
         )
 
     def __str__(self) -> str:
-        return f'TextViewerWidget(name=\'{self.name}\', file=\'{self.file}\')'
+        return f'TextViewerWidget(name={repr(self.name)}, file={repr(self.file)})'
 
     def get_static_files(self):
         return ['RoomConnection.js', 'TextViewerWidget.js', 'see-no-evil-monkey.png']

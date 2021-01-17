@@ -24,7 +24,7 @@ class TerminalWidget(Widget):
         )
 
     def __str__(self) -> str:
-        return f'TerminalWidget(name=\'{self.name}\', image=\'{self.image}\', command=\'{self.command}\', working_directory=\'{self.working_directory if self.working_directory is not None else ""}\')'
+        return f'TerminalWidget(name={repr(self.name)}, image={repr(self.image)}, command={repr(self.command)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
         return [
