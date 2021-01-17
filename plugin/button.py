@@ -13,7 +13,6 @@ class ButtonWidget(Widget):
 
     def __init__(self, config: mkdocs.config.base.Config, url: pathlib.PurePosixPath, soup: bs4.BeautifulSoup, index: int, tag: bs4.element.Tag):
         super().__init__(config, url, soup, index, tag)
-        # TODO: working directory
         self.command = self.tag['command']
         self.image = self.tag['image']
         self.label = self.tag['label']
