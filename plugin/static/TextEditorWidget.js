@@ -5,116 +5,142 @@ class TextEditorWidget {
     this.file = file;
     this.stdoutBuffer = "";
     this.open = false;
+    this.running = false;
     this.setupUi();
   }
   setupUi() {
-    this.element.classList = ["interactive-widgets-text-editor"];
-    this.contentsElement = document.createElement("div");
-    this.contentsElement.classList.add("contents");
+    this.boxElement = document.createElement("div");
+    this.element.appendChild(this.boxElement);
+    this.boxElement.classList = ["interactive-widgets-box", "fixed", "interactive-widgets-text-editor"];
 
-    const buttonsElement = document.createElement("div");
-    buttonsElement.classList.add("buttons");
-    const buttonCreateElement = document.createElement("button");
-    buttonCreateElement.innerText = "Create/Empty";
-    buttonCreateElement.addEventListener("click", () => {
+    this.buttonsElement = document.createElement("div");
+    this.boxElement.appendChild(this.buttonsElement);
+    this.buttonsElement.classList = ["buttons", "show"];
+
+    this.buttonCreateElement = document.createElement("button");
+    this.buttonsElement.appendChild(this.buttonCreateElement);
+    this.buttonCreateElement.disabled = !this.open || this.running;
+    this.buttonCreateElement.innerText = "Create/Empty";
+    this.buttonCreateElement.addEventListener("click", () => {
       if (this.open) {
         this.sendMessage({
           stdin: btoa(JSON.stringify({
             contents: "",
           }) + "\n"),
         });
+        this.running = true;
+        this.buttonCreateElement.disabled = !this.open || this.running;
+        this.buttonSaveElement.disabled = !this.open || this.running;
+        this.buttonDeleteElement.disabled = !this.open || this.running;
       }
     });
-    buttonsElement.appendChild(buttonCreateElement);
-    const spacerBetweenCreateAndSaveElement = document.createElement("div");
-    spacerBetweenCreateAndSaveElement.classList.add("spacer", "hide-on-error");
-    buttonsElement.appendChild(spacerBetweenCreateAndSaveElement);
-    const buttonSaveElement = document.createElement("button");
-    buttonSaveElement.classList.add("hide-on-error");
-    buttonSaveElement.innerText = "Save";
-    buttonSaveElement.addEventListener("click", () => {
+
+    this.spacerBetweenCreateAndSaveElement = document.createElement("div");
+    this.buttonsElement.appendChild(this.spacerBetweenCreateAndSaveElement);
+    this.spacerBetweenCreateAndSaveElement.classList = ["spacer"];
+
+    this.buttonSaveElement = document.createElement("button");
+    this.buttonsElement.appendChild(this.buttonSaveElement);
+    this.buttonSaveElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.innerText = "Save";
+    this.buttonSaveElement.addEventListener("click", () => {
       if (this.open) {
         this.sendMessage({
           stdin: btoa(JSON.stringify({
             contents: btoa(this.editor.getValue()),
           }) + "\n"),
         });
+        this.running = true;
+        this.buttonCreateElement.disabled = !this.open || this.running;
+        this.buttonSaveElement.disabled = !this.open || this.running;
+        this.buttonDeleteElement.disabled = !this.open || this.running;
       }
     });
-    buttonsElement.appendChild(buttonSaveElement);
-    const spacerBetweenSaveAndDeleteElement = document.createElement("div");
-    spacerBetweenSaveAndDeleteElement.classList.add("spacer", "hide-on-error");
-    buttonsElement.appendChild(spacerBetweenSaveAndDeleteElement);
-    const buttonDeleteElement = document.createElement("button");
-    buttonDeleteElement.classList.add("hide-on-error");
-    buttonDeleteElement.innerText = "Delete";
-    buttonDeleteElement.addEventListener("click", () => {
+
+    this.spacerBetweenSaveAndDeleteElement = document.createElement("div");
+    this.buttonsElement.appendChild(this.spacerBetweenSaveAndDeleteElement);
+    this.spacerBetweenSaveAndDeleteElement.classList = ["spacer"];
+
+    this.buttonDeleteElement = document.createElement("button");
+    this.buttonsElement.appendChild(this.buttonDeleteElement);
+    this.buttonDeleteElement.disabled = !this.open || this.running;
+    this.buttonDeleteElement.innerText = "Delete";
+    this.buttonDeleteElement.addEventListener("click", () => {
       if (this.open) {
         this.sendMessage({
           stdin: btoa(JSON.stringify({
             delete: true,
           }) + "\n"),
-        })
-      };
+        });
+        this.running = true;
+        this.buttonCreateElement.disabled = !this.open || this.running;
+        this.buttonSaveElement.disabled = !this.open || this.running;
+        this.buttonDeleteElement.disabled = !this.open || this.running;
+      }
     });
-    buttonsElement.appendChild(buttonDeleteElement);
-    this.contentsElement.appendChild(buttonsElement);
 
-    const errorContainerElement = document.createElement("div");
-    errorContainerElement.classList.add("error-container");
-    const errorElement = document.createElement("div");
-    errorElement.classList.add("error");
-    const emojiElement = document.createElement("img");
-    emojiElement.src = "see-no-evil-monkey.png";
-    emojiElement.alt = "Oops";
-    errorElement.appendChild(emojiElement);
-    const titleElement = document.createElement("div");
-    titleElement.classList.add("title");
-    titleElement.innerText = `Cannot view ${this.file}`;
-    errorElement.appendChild(titleElement);
-    this.errorDescriptionElement = document.createElement("div");
-    this.errorDescriptionElement.classList.add("description");
-    errorElement.appendChild(this.errorDescriptionElement);
-    errorContainerElement.appendChild(errorElement);
-    this.contentsElement.appendChild(errorContainerElement);
-
-    const editorElement = document.createElement("div");
-    editorElement.classList.add("editor");
-    this.editor = CodeMirror(editorElement, {
+    this.editorElement = document.createElement("div");
+    this.boxElement.appendChild(this.editorElement);
+    this.editorElement.classList = ["editor"];
+    this.editor = CodeMirror(this.editorElement, {
       lineNumbers: true,
     });
-    this.contentsElement.appendChild(editorElement);
     this.editor.refresh();
+
+    this.errorElement = document.createElement("div");
+    this.boxElement.appendChild(this.errorElement);
+    this.errorElement.classList = ["error"];
+
+    const svgNamespace = "http://www.w3.org/2000/svg";
+    this.svgElement = document.createElementNS(svgNamespace, "svg");
+    this.boxElement.appendChild(this.svgElement);
+    this.svgElement.setAttributeNS(null, "viewBox", "0 0 24 24");
+
+    this.svgEmptyPathElement = document.createElementNS(svgNamespace, "path");
+    this.svgElement.appendChild(this.svgEmptyPathElement);
+    this.svgEmptyPathElement.setAttributeNS(null, "d", "M0 0h24v24H0z");
+    this.svgEmptyPathElement.setAttributeNS(null, "fill", "none");
+
+    this.svgIconPathElement = document.createElementNS(svgNamespace, "path");
+    this.svgElement.appendChild(this.svgIconPathElement);
+    this.svgIconPathElement.setAttributeNS(null, "d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z");
+
+    this.spanElement = document.createElement("span");
+    this.boxElement.appendChild(this.spanElement);
 
     this.setupError(btoa("There is no data"));
 
-    this.element.appendChild(this.contentsElement);
-
     this.captionElement = document.createElement("div");
-    this.captionElement.classList.add("caption");
-    this.captionElement.innerText = `Editing text of ${this.file}`;
     this.element.appendChild(this.captionElement);
+    this.captionElement.classList = ["interactive-widgets-caption"];
+    this.captionElement.innerText = `Editing text of ${this.file}`;
   }
   setupError(error) {
-    this.contentsElement.classList.remove("with-contents");
-    this.contentsElement.classList.add("with-error");
-
-    this.errorDescriptionElement.innerText = atob(error);
+    this.editorElement.classList.remove("show");
+    this.errorElement.classList.add("show");
+    this.spanElement.innerText = atob(error);
   }
   setupContents(contents) {
-    this.contentsElement.classList.remove("with-error");
-    this.contentsElement.classList.add("with-contents");
-
+    this.running = false;
+    this.buttonCreateElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running;
+    this.buttonDeleteElement.disabled = !this.open || this.running;
+    this.errorElement.classList.remove("show");
+    this.editorElement.classList.add("show");
     this.editor.setValue(atob(contents));
     this.editor.refresh();
   }
   handleOpen() {
     this.open = true;
-    this.element.classList.add("open");
+    this.buttonCreateElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running;
+    this.buttonDeleteElement.disabled = !this.open || this.running;
   }
   handleClose() {
     this.open = false;
-    this.element.classList.remove("open");
+    this.buttonCreateElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running;
+    this.buttonDeleteElement.disabled = !this.open || this.running;
   }
   handleMessage(message) {
     if (message.type != "output") {
