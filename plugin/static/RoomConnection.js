@@ -72,7 +72,7 @@ class RoomConnection {
     if (this.disconnectedElement === null) {
       this.disconnectedElement = document.createElement("div");
       document.body.insertBefore(this.disconnectedElement, document.body.firstChild);
-      this.disconnectedElement.classList = ["interactive-widgets-disconnected"];
+      this.disconnectedElement.classList.add("interactive-widgets-disconnected");
 
       const disconnectedBoxElement = document.createElement("div");
       this.disconnectedElement.appendChild(disconnectedBoxElement);

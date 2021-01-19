@@ -11,11 +11,11 @@ class TextEditorWidget {
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
-    this.boxElement.classList = ["interactive-widgets-box", "fixed", "interactive-widgets-text-editor"];
+    this.boxElement.classList.add("interactive-widgets-box", "fixed", "interactive-widgets-text-editor");
 
     this.buttonsElement = document.createElement("div");
     this.boxElement.appendChild(this.buttonsElement);
-    this.buttonsElement.classList = ["buttons", "show"];
+    this.buttonsElement.classList.add("buttons", "show");
 
     this.buttonCreateElement = document.createElement("button");
     this.buttonsElement.appendChild(this.buttonCreateElement);
@@ -37,7 +37,7 @@ class TextEditorWidget {
 
     this.spacerBetweenCreateAndSaveElement = document.createElement("div");
     this.buttonsElement.appendChild(this.spacerBetweenCreateAndSaveElement);
-    this.spacerBetweenCreateAndSaveElement.classList = ["spacer"];
+    this.spacerBetweenCreateAndSaveElement.classList.add("spacer");
 
     this.buttonSaveElement = document.createElement("button");
     this.buttonsElement.appendChild(this.buttonSaveElement);
@@ -59,7 +59,7 @@ class TextEditorWidget {
 
     this.spacerBetweenSaveAndDeleteElement = document.createElement("div");
     this.buttonsElement.appendChild(this.spacerBetweenSaveAndDeleteElement);
-    this.spacerBetweenSaveAndDeleteElement.classList = ["spacer"];
+    this.spacerBetweenSaveAndDeleteElement.classList.add("spacer");
 
     this.buttonDeleteElement = document.createElement("button");
     this.buttonsElement.appendChild(this.buttonDeleteElement);
@@ -81,7 +81,7 @@ class TextEditorWidget {
 
     this.editorElement = document.createElement("div");
     this.boxElement.appendChild(this.editorElement);
-    this.editorElement.classList = ["editor"];
+    this.editorElement.classList.add("editor");
     this.editor = CodeMirror(this.editorElement, {
       lineNumbers: true,
     });
@@ -89,7 +89,7 @@ class TextEditorWidget {
 
     this.errorElement = document.createElement("div");
     this.boxElement.appendChild(this.errorElement);
-    this.errorElement.classList = ["error"];
+    this.errorElement.classList.add("error");
 
     const svgNamespace = "http://www.w3.org/2000/svg";
     this.svgElement = document.createElementNS(svgNamespace, "svg");
@@ -112,7 +112,7 @@ class TextEditorWidget {
 
     this.captionElement = document.createElement("div");
     this.element.appendChild(this.captionElement);
-    this.captionElement.classList = ["interactive-widgets-caption"];
+    this.captionElement.classList.add("interactive-widgets-caption");
     this.captionElement.innerText = `Editing text of ${this.file}`;
   }
   setupError(error) {

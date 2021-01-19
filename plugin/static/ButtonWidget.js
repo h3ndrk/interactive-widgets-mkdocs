@@ -11,11 +11,11 @@ class ButtonWidget {
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
-    this.boxElement.classList = ["interactive-widgets-box", "shrink", "interactive-widgets-button"];
+    this.boxElement.classList.add("interactive-widgets-box", "shrink", "interactive-widgets-button");
 
     this.buttonsElement = document.createElement("div");
     this.boxElement.appendChild(this.buttonsElement);
-    this.buttonsElement.classList = ["buttons", "show"];
+    this.buttonsElement.classList.add("buttons", "show");
 
     this.buttonElement = document.createElement("button");
     this.buttonsElement.appendChild(this.buttonElement);
@@ -29,12 +29,12 @@ class ButtonWidget {
 
     this.commandElement = document.createElement("div");
     this.boxElement.appendChild(this.commandElement);
-    this.commandElement.classList = ["command", "show"];
+    this.commandElement.classList.add("command", "show");
     this.commandElement.innerText = this.command;
 
     this.outputsElement = document.createElement("div");
     this.boxElement.appendChild(this.outputsElement);
-    this.outputsElement.classList = ["outputs", "show"];
+    this.outputsElement.classList.add("outputs", "show");
   }
   handleOpen() {
     this.open = true;

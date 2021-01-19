@@ -10,15 +10,15 @@ class TextViewerWidget {
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
-    this.boxElement.classList = ["interactive-widgets-box", "fixed", "interactive-widgets-text-viewer"];
+    this.boxElement.classList.add("interactive-widgets-box", "fixed", "interactive-widgets-text-viewer");
 
     this.viewerElement = document.createElement("div");
     this.boxElement.appendChild(this.viewerElement);
-    this.viewerElement.classList = ["viewer"];
+    this.viewerElement.classList.add("viewer");
 
     this.errorElement = document.createElement("div");
     this.boxElement.appendChild(this.errorElement);
-    this.errorElement.classList = ["error"];
+    this.errorElement.classList.add("error");
 
     const svgNamespace = "http://www.w3.org/2000/svg";
     this.svgElement = document.createElementNS(svgNamespace, "svg");
@@ -41,7 +41,7 @@ class TextViewerWidget {
 
     this.captionElement = document.createElement("div");
     this.element.appendChild(this.captionElement);
-    this.captionElement.classList = ["interactive-widgets-caption"];
+    this.captionElement.classList.add("interactive-widgets-caption");
     this.captionElement.innerText = `Viewing text of ${this.file}`;
   }
   setupError(error) {
