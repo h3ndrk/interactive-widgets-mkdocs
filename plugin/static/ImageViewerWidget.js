@@ -9,50 +9,46 @@ class ImageViewerWidget {
     this.setupUi();
   }
   setupUi() {
-    this.element.classList = ["interactive-widgets-image-viewer"];
-    this.contentsElement = document.createElement("div");
-    this.contentsElement.classList.add("contents", "with-error");
+    this.boxElement = document.createElement("div");
+    this.element.appendChild(this.boxElement);
+    this.boxElement.classList = ["interactive-widgets-box", "fixed", "interactive-widgets-image-viewer"];
+
+    this.errorElement = document.createElement("div");
+    this.boxElement.appendChild(this.errorElement);
+    this.errorElement.classList = ["error"];
+
+    const svgNamespace = "http://www.w3.org/2000/svg";
+    this.svgElement = document.createElementNS(svgNamespace, "svg");
+    this.boxElement.appendChild(this.svgElement);
+    this.svgElement.setAttributeNS(null, "viewBox", "0 0 24 24");
+
+    this.svgEmptyPathElement = document.createElementNS(svgNamespace, "path");
+    this.svgElement.appendChild(this.svgEmptyPathElement);
+    this.svgEmptyPathElement.setAttributeNS(null, "d", "M0 0h24v24H0z");
+    this.svgEmptyPathElement.setAttributeNS(null, "fill", "none");
+
+    this.svgIconPathElement = document.createElementNS(svgNamespace, "path");
+    this.svgElement.appendChild(this.svgIconPathElement);
+    this.svgIconPathElement.setAttributeNS(null, "d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z");
+
+    this.spanElement = document.createElement("span");
+    this.boxElement.appendChild(this.spanElement);
+
     this.setupError(btoa("There is no data"));
-    this.element.appendChild(this.contentsElement);
+
     this.captionElement = document.createElement("div");
-    this.captionElement.classList.add("caption");
-    this.captionElement.innerText = `Viewing image from ${this.file}`;
     this.element.appendChild(this.captionElement);
+    this.captionElement.classList = ["interactive-widgets-caption"];
+    this.captionElement.innerText = `Viewing image from ${this.file}`;
   }
   setupError(error) {
-    while (this.contentsElement.firstChild) {
-      this.contentsElement.removeChild(this.contentsElement.firstChild);
-    }
-
-    this.contentsElement.classList.remove("with-contents");
-    this.contentsElement.classList.add("with-error");
-
-    this.contentsElement.style.backgroundImage = "none";
-    const errorElement = document.createElement("div");
-    errorElement.classList.add("error");
-    const emojiElement = document.createElement("img");
-    emojiElement.src = "see-no-evil-monkey.png";
-    emojiElement.alt = "Oops";
-    errorElement.appendChild(emojiElement);
-    const titleElement = document.createElement("div");
-    titleElement.classList.add("title");
-    titleElement.innerText = `Cannot view ${this.file}`;
-    errorElement.appendChild(titleElement);
-    const descriptionElement = document.createElement("div");
-    descriptionElement.classList.add("description");
-    descriptionElement.innerText = atob(error);
-    errorElement.appendChild(descriptionElement);
-    this.contentsElement.appendChild(errorElement);
+    this.boxElement.style.backgroundImage = "none";
+    this.errorElement.classList.add("show");
+    this.spanElement.innerText = atob(error);
   }
   setupContents(contents) {
-    while (this.contentsElement.firstChild) {
-      this.contentsElement.removeChild(this.contentsElement.firstChild);
-    }
-
-    this.contentsElement.classList.remove("with-error");
-    this.contentsElement.classList.add("with-contents");
-
-    this.contentsElement.style.backgroundImage = `url(data:${this.mime};base64,${contents})`;
+    this.errorElement.classList.remove("show");
+    this.boxElement.style.backgroundImage = `url(data:${this.mime};base64,${contents})`;
   }
   handleOpen() {
     this.open = true;
