@@ -11,7 +11,7 @@ class ButtonWidget {
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
-    this.boxElement.classList.add("interactive-widgets-box", "shrink", "interactive-widgets-button");
+    this.boxElement.classList.add("interactive-widgets-box", "shrink", "interactive-widgets-button", "empty");
 
     this.buttonsElement = document.createElement("div");
     this.boxElement.appendChild(this.buttonsElement);
@@ -34,7 +34,7 @@ class ButtonWidget {
 
     this.outputsElement = document.createElement("div");
     this.boxElement.appendChild(this.outputsElement);
-    this.outputsElement.classList.add("outputs", "show");
+    this.outputsElement.classList.add("outputs");
   }
   handleOpen() {
     this.open = true;
@@ -52,15 +52,21 @@ class ButtonWidget {
         while (this.outputsElement.firstChild) {
           this.outputsElement.removeChild(this.outputsElement.firstChild);
         }
+        this.boxElement.classList.add("empty");
+        this.outputsElement.classList.remove("show");
         break;
       }
       case "output": {
         if ("stdout" in message) {
+          this.boxElement.classList.remove("empty");
+          this.outputsElement.classList.add("show");
           const lineElement = document.createElement("div");
           lineElement.classList.add("line", "stdout");
           lineElement.innerText = atob(message.stdout);
           this.outputsElement.appendChild(lineElement);
         } else if ("stderr" in message) {
+          this.boxElement.classList.remove("empty");
+          this.outputsElement.classList.add("show");
           const lineElement = document.createElement("div");
           lineElement.classList.add("line", "stderr");
           lineElement.innerText = atob(message.stderr);
@@ -76,6 +82,8 @@ class ButtonWidget {
       case "errored": {
         this.running = false;
         this.buttonElement.disabled = !this.open || this.running;
+        this.boxElement.classList.remove("empty");
+        this.outputsElement.classList.add("show");
         const errorElement = document.createElement("div");
         errorElement.classList.add("error");
         errorElement.innerText = atob(message.stdout);
