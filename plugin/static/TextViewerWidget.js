@@ -22,7 +22,7 @@ class TextViewerWidget {
 
     const svgNamespace = "http://www.w3.org/2000/svg";
     this.svgElement = document.createElementNS(svgNamespace, "svg");
-    this.boxElement.appendChild(this.svgElement);
+    this.errorElement.appendChild(this.svgElement);
     this.svgElement.setAttributeNS(null, "viewBox", "0 0 24 24");
 
     this.svgEmptyPathElement = document.createElementNS(svgNamespace, "path");
@@ -35,7 +35,7 @@ class TextViewerWidget {
     this.svgIconPathElement.setAttributeNS(null, "d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z");
 
     this.spanElement = document.createElement("span");
-    this.boxElement.appendChild(this.spanElement);
+    this.errorElement.appendChild(this.spanElement);
 
     this.setupError(btoa("There is no data"));
 

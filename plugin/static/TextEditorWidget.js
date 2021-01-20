@@ -6,6 +6,7 @@ class TextEditorWidget {
     this.stdoutBuffer = "";
     this.open = false;
     this.running = false;
+    this.hasContents = false;
     this.setupUi();
   }
   setupUi() {
@@ -30,8 +31,8 @@ class TextEditorWidget {
         });
         this.running = true;
         this.buttonCreateElement.disabled = !this.open || this.running;
-        this.buttonSaveElement.disabled = !this.open || this.running;
-        this.buttonDeleteElement.disabled = !this.open || this.running;
+        this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+        this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
       }
     });
 
@@ -52,8 +53,8 @@ class TextEditorWidget {
         });
         this.running = true;
         this.buttonCreateElement.disabled = !this.open || this.running;
-        this.buttonSaveElement.disabled = !this.open || this.running;
-        this.buttonDeleteElement.disabled = !this.open || this.running;
+        this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+        this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
       }
     });
 
@@ -74,8 +75,8 @@ class TextEditorWidget {
         });
         this.running = true;
         this.buttonCreateElement.disabled = !this.open || this.running;
-        this.buttonSaveElement.disabled = !this.open || this.running;
-        this.buttonDeleteElement.disabled = !this.open || this.running;
+        this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+        this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
       }
     });
 
@@ -93,7 +94,7 @@ class TextEditorWidget {
 
     const svgNamespace = "http://www.w3.org/2000/svg";
     this.svgElement = document.createElementNS(svgNamespace, "svg");
-    this.boxElement.appendChild(this.svgElement);
+    this.errorElement.appendChild(this.svgElement);
     this.svgElement.setAttributeNS(null, "viewBox", "0 0 24 24");
 
     this.svgEmptyPathElement = document.createElementNS(svgNamespace, "path");
@@ -106,7 +107,7 @@ class TextEditorWidget {
     this.svgIconPathElement.setAttributeNS(null, "d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z");
 
     this.spanElement = document.createElement("span");
-    this.boxElement.appendChild(this.spanElement);
+    this.errorElement.appendChild(this.spanElement);
 
     this.setupError(btoa("There is no data"));
 
@@ -116,15 +117,21 @@ class TextEditorWidget {
     this.captionElement.innerText = `Editing text of ${this.file}`;
   }
   setupError(error) {
+    this.running = false;
+    this.hasContents = false;
+    this.buttonCreateElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
     this.editorElement.classList.remove("show");
     this.errorElement.classList.add("show");
     this.spanElement.innerText = atob(error);
   }
   setupContents(contents) {
     this.running = false;
+    this.hasContents = true;
     this.buttonCreateElement.disabled = !this.open || this.running;
-    this.buttonSaveElement.disabled = !this.open || this.running;
-    this.buttonDeleteElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
     this.errorElement.classList.remove("show");
     this.editorElement.classList.add("show");
     this.editor.setValue(atob(contents));
@@ -133,14 +140,14 @@ class TextEditorWidget {
   handleOpen() {
     this.open = true;
     this.buttonCreateElement.disabled = !this.open || this.running;
-    this.buttonSaveElement.disabled = !this.open || this.running;
-    this.buttonDeleteElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
   }
   handleClose() {
     this.open = false;
     this.buttonCreateElement.disabled = !this.open || this.running;
-    this.buttonSaveElement.disabled = !this.open || this.running;
-    this.buttonDeleteElement.disabled = !this.open || this.running;
+    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
+    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
   }
   handleMessage(message) {
     if (message.type != "output") {
