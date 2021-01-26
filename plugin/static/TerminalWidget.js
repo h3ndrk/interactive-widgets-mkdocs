@@ -22,9 +22,10 @@ class TerminalWidget {
   setupTerminal() {
     this.terminal = new Terminal({
       fontFamily: "JetBrains Mono",
+      allowTransparency: true,
       theme: {
         foreground: "#000",
-        background: "#eee",
+        background: "transparent",
         black: "#000",
         blue: "#2196f3",
         brightBlack: "#000",
@@ -36,7 +37,7 @@ class TerminalWidget {
         brightWhite: "#000",
         brightYellow: "#fdd835",
         cursor: "#000",
-        cursorAccent: "#000",
+        cursorAccent: "#fff",
         cyan: "#00acc1",
         green: "#43a047",
         magenta: "#9c27b0",
