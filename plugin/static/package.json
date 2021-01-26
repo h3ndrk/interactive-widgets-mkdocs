@@ -5,6 +5,7 @@
   "main": "ButtonWidget.js",
   "dependencies": {
     "codemirror": "^5.58.2",
+    "fontfaceobserver": "^2.1.0",
     "xterm": "^4.9.0",
     "xterm-addon-fit": "^0.4.0"
   },

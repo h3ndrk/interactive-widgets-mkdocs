@@ -30,6 +30,7 @@ class TerminalWidget(Widget):
         return [
             'RoomConnection.js',
             'TerminalWidget.js',
+            'node_modules/fontfaceobserver/fontfaceobserver.standalone.js',
             'node_modules/xterm/lib',
             'node_modules/xterm-addon-fit/lib',
             'node_modules/xterm/css',
@@ -41,6 +42,11 @@ class TerminalWidget(Widget):
 
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/TerminalWidget.js')
+
+        script_fontfaceobserver = self.soup.new_tag('script')
+        script_fontfaceobserver['src'] = self._relative(
+            '/node_modules/fontfaceobserver/fontfaceobserver.standalone.js',
+        )
 
         script_xterm = self.soup.new_tag('script')
         script_xterm['src'] = self._relative(
@@ -61,6 +67,7 @@ class TerminalWidget(Widget):
         return super().get_head_prepends() + [
             script_room_connection,
             script_widget,
+            script_fontfaceobserver,
             script_xterm,
             script_xterm_fit,
             style_xterm,
