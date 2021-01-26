@@ -1,3 +1,29 @@
+class WebfontAddon {
+  activate(terminal) {
+    this._terminal = terminal;
+    terminal.loadWebfontAndOpen = function (element) {
+      const fontFamily = this.getOption("fontFamily");
+      const regular = new FontFaceObserver(fontFamily).load();
+      const bold = new FontFaceObserver(fontFamily, { weight: "bold" }).load();
+
+      return regular.constructor.all([regular, bold]).then(
+        () => {
+          this.open(element);
+          return this;
+        },
+        () => {
+          this.setOption("fontFamily", "Courier");
+          this.open(element);
+          return this;
+        }
+      );
+    };
+  }
+  dispose() {
+    delete this._terminal.loadWebfontAndOpen;
+  }
+}
+
 class TerminalWidget {
   constructor(element, sendMessage, workingDirectory) {
     this.element = element;
@@ -49,7 +75,9 @@ class TerminalWidget {
     });
     this.fitAddon = new FitAddon.FitAddon();
     this.terminal.loadAddon(this.fitAddon);
-    this.terminal.open(this.terminalElement);
+    this.webfontAddon = new WebfontAddon();
+    this.terminal.loadAddon(this.webfontAddon);
+    this.terminal.loadWebfontAndOpen(this.terminalElement);
     this.terminal.onData(data => {
       if (this.open) {
         this.sendMessage({
