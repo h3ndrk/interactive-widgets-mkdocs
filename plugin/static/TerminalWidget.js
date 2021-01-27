@@ -1,53 +1,44 @@
-class WebfontAddon {
-  activate(terminal) {
-    this._terminal = terminal;
-    terminal.loadWebfontAndOpen = function (element) {
-      const fontFamily = this.getOption("fontFamily");
-      const regular = new FontFaceObserver(fontFamily).load();
-      const bold = new FontFaceObserver(fontFamily, { weight: "bold" }).load();
-
-      return regular.constructor.all([regular, bold]).then(
-        () => {
-          this.open(element);
-          return this;
-        },
-        () => {
-          this.setOption("fontFamily", "Courier");
-          this.open(element);
-          return this;
-        }
-      );
-    };
-  }
-  dispose() {
-    delete this._terminal.loadWebfontAndOpen;
-  }
-}
-
 class TerminalWidget {
-  constructor(element, sendMessage, workingDirectory) {
+  constructor(element, sendMessage, command, workingDirectory) {
     this.element = element;
     this.sendMessage = sendMessage;
+    this.command = command;
     this.workingDirectory = workingDirectory;
     this.open = false;
     this.size = null;
     this.setupUi();
   }
-  setupUi() {
-    this.element.classList = ["interactive-widgets-terminal"];
-    this.titleElement = document.createElement("div");
-    this.titleElement.classList.add("title");
-    this.titleElement.innerText = "";
-    this.element.appendChild(this.titleElement);
-    this.terminalElement = document.createElement("div");
-    this.terminalElement.classList.add("terminal");
-    this.terminalElement.innerText = "";
-    this.element.appendChild(this.terminalElement);
-    this.setupTerminal();
-  }
-  setupTerminal() {
+  async setupUi() {
+    this.boxElement = document.createElement("div");
+    this.element.appendChild(this.boxElement);
+    this.boxElement.classList.add("interactive-widgets-box", "fixed", "interactive-widgets-terminal");
+
+    this.captionElement = document.createElement("div");
+    this.element.appendChild(this.captionElement);
+    this.captionElement.classList.add("interactive-widgets-caption");
+    this.captionElement.innerText = `Terminal: ${this.command} (${this.workingDirectory})`;
+
+    this.regularFontElement = document.createElement("div");
+    this.boxElement.appendChild(this.regularFontElement);
+    this.regularFontElement.classList.add("show");
+    this.regularFontElement.style.fontWeight = 400;
+    this.regularFontElement.innerHTML = "&nbsp;";
+
+    this.boldFontElement = document.createElement("div");
+    this.boxElement.appendChild(this.boldFontElement);
+    this.boldFontElement.classList.add("show");
+    this.regularFontElement.style.fontWeight = 700;
+    this.boldFontElement.innerHTML = "&nbsp;";
+
+    await document.fonts.ready;
+
+    while (this.boxElement.firstChild) {
+      this.boxElement.removeChild(this.boxElement.firstChild);
+    }
+
+    const computedStyle = window.getComputedStyle(this.boxElement);
     this.terminal = new Terminal({
-      fontFamily: "JetBrains Mono",
+      fontFamily: computedStyle.getPropertyValue("font-family"),
       allowTransparency: true,
       theme: {
         foreground: "#000",
@@ -73,11 +64,11 @@ class TerminalWidget {
         yellow: "#fdd835",
       },
     });
+
     this.fitAddon = new FitAddon.FitAddon();
     this.terminal.loadAddon(this.fitAddon);
-    this.webfontAddon = new WebfontAddon();
-    this.terminal.loadAddon(this.webfontAddon);
-    this.terminal.loadWebfontAndOpen(this.terminalElement);
+    this.terminal.open(this.boxElement);
+
     this.terminal.onData(data => {
       if (this.open) {
         this.sendMessage({
@@ -85,9 +76,11 @@ class TerminalWidget {
         });
       }
     });
+
     this.terminal.onTitleChange(title => {
-      this.titleElement.innerText = `Terminal: ${title}`;
+      this.captionElement.innerText = `Terminal: ${title}`;
     });
+
     this.terminal.onResize(size => {
       this.size = size;
       if (this.open) {
@@ -96,6 +89,7 @@ class TerminalWidget {
         });
       }
     });
+
     this.fitAddon.fit();
     window.addEventListener("resize", () => {
       this.fitAddon.fit();
@@ -115,6 +109,8 @@ class TerminalWidget {
     this.element.classList.remove("open");
   }
   handleMessage(message) {
-    this.terminal.write(atob(message.stdout));
+    if (this.terminal) {
+      this.terminal.write(atob(message.stdout));
+    }
   }
 }
