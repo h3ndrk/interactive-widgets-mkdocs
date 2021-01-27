@@ -32,7 +32,15 @@ class TextViewerWidget(Widget):
         return f'TextViewerWidget(name={repr(self.name)}, file={repr(self.file)})'
 
     def get_static_files(self):
-        return ['RoomConnection.js', 'TextViewerWidget.js']
+        return [
+            'RoomConnection.js',
+            'TextViewerWidget.js',
+            'node_modules/codemirror/addon',
+            'node_modules/codemirror/keymap',
+            'node_modules/codemirror/lib',
+            'node_modules/codemirror/mode',
+            'node_modules/codemirror/theme',
+        ]
 
     def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
         script_room_connection = self.soup.new_tag('script')
@@ -41,9 +49,22 @@ class TextViewerWidget(Widget):
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/TextViewerWidget.js')
 
+        script_codemirror = self.soup.new_tag('script')
+        script_codemirror['src'] = self._relative(
+            '/node_modules/codemirror/lib/codemirror.js',
+        )
+
+        style_codemirror = self.soup.new_tag('link')
+        style_codemirror['rel'] = 'stylesheet'
+        style_codemirror['href'] = self._relative(
+            '/node_modules/codemirror/lib/codemirror.css',
+        )
+
         return super().get_head_prepends() + [
             script_room_connection,
             script_widget,
+            script_codemirror,
+            style_codemirror,
         ]
 
     def get_replacement(self) -> bs4.element.Tag:

@@ -15,6 +15,12 @@ class TextViewerWidget {
     this.viewerElement = document.createElement("div");
     this.boxElement.appendChild(this.viewerElement);
     this.viewerElement.classList.add("viewer");
+    this.editor = CodeMirror(this.viewerElement, {
+      lineNumbers: true,
+      lineWrapping: true,
+      readOnly: "nocursor",
+    });
+    this.editor.refresh();
 
     this.errorElement = document.createElement("div");
     this.boxElement.appendChild(this.errorElement);
@@ -46,28 +52,14 @@ class TextViewerWidget {
   }
   setupError(error) {
     this.viewerElement.classList.remove("show");
-    while (this.viewerElement.firstChild) {
-      this.viewerElement.removeChild(this.viewerElement.firstChild);
-    }
     this.errorElement.classList.add("show");
     this.spanElement.innerText = atob(error);
   }
   setupContents(contents) {
-    while (this.viewerElement.firstChild) {
-      this.viewerElement.removeChild(this.viewerElement.firstChild);
-    }
-    for (const [lineNumber, line] of atob(contents).split("\n").entries()) {
-      const lineNumberElement = document.createElement("div");
-      this.viewerElement.appendChild(lineNumberElement);
-      lineNumberElement.classList.add("line-number");
-      lineNumberElement.innerText = `${lineNumber + 1}`;
-      const lineElement = document.createElement("div");
-      this.viewerElement.appendChild(lineElement);
-      lineElement.classList.add("line");
-      lineElement.innerText = line;
-    }
     this.viewerElement.classList.add("show");
     this.errorElement.classList.remove("show");
+    this.editor.setValue(atob(contents));
+    this.editor.refresh();
   }
   handleOpen() {
     this.open = true;
