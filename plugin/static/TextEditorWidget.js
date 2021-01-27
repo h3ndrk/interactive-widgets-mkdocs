@@ -85,6 +85,7 @@ class TextEditorWidget {
     this.editorElement.classList.add("editor");
     this.editor = CodeMirror(this.editorElement, {
       lineNumbers: true,
+      lineWrapping: true,
     });
     this.editor.refresh();
 
