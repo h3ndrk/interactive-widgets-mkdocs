@@ -11,6 +11,7 @@ class TextViewerWidget(Widget):
     def __init__(self, config: mkdocs.config.base.Config, url: pathlib.PurePosixPath, soup: bs4.BeautifulSoup, index: int, tag: bs4.element.Tag):
         super().__init__(config, url, soup, index, tag)
         self.file = self.tag['file']
+        self.mode = self.tag.get('mode')
         self.success_timeout = self.tag.get(
             'success-timeout',
             str(self.config['backend_monitor_default_success_timeout']),
@@ -60,12 +61,19 @@ class TextViewerWidget(Widget):
             '/node_modules/codemirror/lib/codemirror.css',
         )
 
+        script_codemirror_mode = []
+        if self.mode is not None:
+            script_codemirror_mode.append(self.soup.new_tag('script'))
+            script_codemirror_mode[0]['src'] = self._relative(
+                f'/node_modules/codemirror/mode/{self.mode}/{self.mode}.js',
+            )
+
         return super().get_head_prepends() + [
             script_room_connection,
             script_widget,
             script_codemirror,
             style_codemirror,
-        ]
+        ] + script_codemirror_mode
 
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')
@@ -74,11 +82,13 @@ class TextViewerWidget(Widget):
 
     def get_body_appends(self) -> typing.List[bs4.element.Tag]:
         script = self.soup.new_tag('script')
+        mode_parameter = f'"{self._sanitize_javascript(self.mode)}"' if self.mode is not None else 'null'
         script.append(
             f'''roomConnection.subscribe("{self.name}", new TextViewerWidget(
                 document.getElementById("widget-text-viewer-{self.name}"),
                 roomConnection.getSendMessageCallback("{self.name}"),
                 "{self._sanitize_javascript(self.file)}",
+                {mode_parameter},
             ));''',
         )
         return [script]
