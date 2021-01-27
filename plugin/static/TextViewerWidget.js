@@ -1,8 +1,9 @@
 class TextViewerWidget {
-  constructor(element, sendMessage, file) {
+  constructor(element, sendMessage, file, mode) {
     this.element = element;
     this.sendMessage = sendMessage;
     this.file = file;
+    this.mode = mode;
     this.stdoutBuffer = "";
     this.open = false;
     this.setupUi();
@@ -19,6 +20,7 @@ class TextViewerWidget {
       lineNumbers: true,
       lineWrapping: true,
       readOnly: "nocursor",
+      mode: this.mode,
     });
     this.editor.refresh();
 

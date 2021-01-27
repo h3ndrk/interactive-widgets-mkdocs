@@ -1,8 +1,9 @@
 class TextEditorWidget {
-  constructor(element, sendMessage, file) {
+  constructor(element, sendMessage, file, mode) {
     this.element = element;
     this.sendMessage = sendMessage;
     this.file = file;
+    this.mode = mode;
     this.stdoutBuffer = "";
     this.open = false;
     this.running = false;
@@ -86,6 +87,7 @@ class TextEditorWidget {
     this.editor = CodeMirror(this.editorElement, {
       lineNumbers: true,
       lineWrapping: true,
+      mode: this.mode,
     });
     this.editor.refresh();
 
