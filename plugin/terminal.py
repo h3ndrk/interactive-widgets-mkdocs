@@ -28,25 +28,15 @@ class TerminalWidget(Widget):
 
     def get_static_files(self):
         return [
-            'RoomConnection.js',
             'TerminalWidget.js',
-            'node_modules/fontfaceobserver/fontfaceobserver.standalone.js',
             'node_modules/xterm/lib',
             'node_modules/xterm-addon-fit/lib',
             'node_modules/xterm/css',
         ]
 
-    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
-        script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/RoomConnection.js')
-
+    def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/TerminalWidget.js')
-
-        script_fontfaceobserver = self.soup.new_tag('script')
-        script_fontfaceobserver['src'] = self._relative(
-            '/node_modules/fontfaceobserver/fontfaceobserver.standalone.js',
-        )
 
         script_xterm = self.soup.new_tag('script')
         script_xterm['src'] = self._relative(
@@ -64,10 +54,8 @@ class TerminalWidget(Widget):
             '/node_modules/xterm/css/xterm.css',
         )
 
-        return super().get_head_prepends() + [
-            script_room_connection,
+        return [
             script_widget,
-            script_fontfaceobserver,
             script_xterm,
             script_xterm_fit,
             style_xterm,
@@ -78,17 +66,30 @@ class TerminalWidget(Widget):
         div['id'] = f'widget-terminal-{self.name}'
         return div
 
-    def get_body_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_instantiation(self) -> bs4.element.Tag:
         script = self.soup.new_tag('script')
-        script.append(
-            f'''roomConnection.subscribe("{self.name}", new TerminalWidget(
-                document.getElementById("widget-terminal-{self.name}"),
-                roomConnection.getSendMessageCallback("{self.name}"),
-                "{self._sanitize_javascript(self.command)}",
-                "{self._sanitize_javascript(self.working_directory)}",
-            ));''',
-        )
-        return [script]
+        script.append(f'''
+            {{
+                roomConnection.addWidget();
+                const widget = new TerminalWidget(
+                    document.getElementById("widget-terminal-{self.name}"),
+                    "{self._sanitize_javascript(self.command)}",
+                    "{self._sanitize_javascript(self.working_directory)}",
+                );
+                widget.addEventListener("ready", function _listener() {{
+                    roomConnection.markWidgetReady();
+                    widget.removeEventListener("ready", _listener);
+                }});
+                widget.addEventListener("message", event => {{
+                    roomConnection.sendMessage("{self.name}", event.detail);
+                }});
+                roomConnection.addEventListener("{self.name}", event => {{
+                    widget.handleMessage(event.detail);
+                }});
+                widget.start();
+            }}
+        ''')
+        return script
 
     def get_backend_configuration(self) -> dict:
         configuration = {

@@ -1,13 +1,17 @@
-class TextViewerWidget {
-  constructor(element, sendMessage, file, mode) {
+class TextViewerWidget extends EventTarget {
+  constructor(element, file, mode) {
+    super();
     this.element = element;
-    this.sendMessage = sendMessage;
     this.file = file;
     this.mode = mode;
     this.stdoutBuffer = "";
-    this.open = false;
-    this.setupUi();
   }
+
+  start() {
+    this.setupUi();
+    this.dispatchEvent(new Event("ready"));
+  }
+
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
@@ -52,23 +56,20 @@ class TextViewerWidget {
     this.captionElement.classList.add("interactive-widgets-caption");
     this.captionElement.innerText = `Viewing text of ${this.file}`;
   }
+
   setupError(error) {
     this.viewerElement.classList.remove("show");
     this.errorElement.classList.add("show");
     this.spanElement.innerText = atob(error);
   }
+
   setupContents(contents) {
     this.viewerElement.classList.add("show");
     this.errorElement.classList.remove("show");
     this.editor.setValue(atob(contents));
     this.editor.refresh();
   }
-  handleOpen() {
-    this.open = true;
-  }
-  handleClose() {
-    this.open = false;
-  }
+
   handleMessage(message) {
     if (message.type != "output") {
       console.warn("Message type not implemented:", message);

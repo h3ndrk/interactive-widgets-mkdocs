@@ -1,13 +1,18 @@
-class ButtonWidget {
-  constructor(element, sendMessage, command, label) {
+class ButtonWidget extends EventTarget {
+  constructor(element, command, label) {
+    super();
     this.element = element;
-    this.sendMessage = sendMessage;
     this.command = command;
     this.label = label;
     this.open = false;
     this.running = false;
-    this.setupUi();
   }
+
+  start() {
+    this.setupUi();
+    this.dispatchEvent(new Event("ready"));
+  }
+
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
@@ -23,7 +28,7 @@ class ButtonWidget {
     this.buttonElement.innerText = this.label;
     this.buttonElement.addEventListener("click", () => {
       if (this.open) {
-        this.sendMessage(null);
+        this.dispatchEvent(new CustomEvent("message", { detail: null }));
       }
     });
 
@@ -36,14 +41,17 @@ class ButtonWidget {
     this.boxElement.appendChild(this.outputsElement);
     this.outputsElement.classList.add("outputs");
   }
+
   handleOpen() {
     this.open = true;
     this.buttonElement.disabled = !this.open || this.running;
   }
+
   handleClose() {
     this.open = false;
     this.buttonElement.disabled = !this.open || this.running;
   }
+
   handleMessage(message) {
     switch (message.type) {
       case "started": {

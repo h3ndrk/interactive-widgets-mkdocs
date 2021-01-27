@@ -94,35 +94,78 @@ class Plugin(mkdocs.plugins.BasePlugin):
         ]
 
         if len(widgets) > 0:
-            page_url = str(pathlib.PurePosixPath('/') / page.url)
-            self.backend_configuration['pages'][page_url] = {
+            page_url = pathlib.PurePosixPath('/') / page.url
+            self.backend_configuration['pages'][str(page_url)] = {
                 'type': self.config['backend_type'],
                 'logger_name_page': 'Page',
                 'logger_name_room_connection': 'RoomConnection',
                 'logger_name_room': f'{self.config["backend_type"].capitalize()}Room',
                 'executors': {},
             }
+            
+            current_head = soup.find(string=lambda text: isinstance(text, bs4.Comment) and text.string.strip() == 'interactive-widgets')
+            assert current_head is not None
+            
+            script_redirect = soup.new_tag('script')
+            script_redirect.append('''
+                const currentUrl = new URL(window.location);
+                const currentUrlSearchParams = new URLSearchParams(currentUrl.search);
+                const currentRoomName = currentUrlSearchParams.get("roomName");
+                // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
+                if (currentRoomName === null || !currentRoomName.match(new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i))) {
+                    // https://gist.github.com/outbreak/316637cde245160c2579898b21837c1c
+                    const getRandomSymbol = (symbol) => {
+                        var array;
+                        if (symbol === "y") {
+                        array = ["8", "9", "a", "b"];
+                        return array[Math.floor(Math.random() * array.length)];
+                        }
+                        array = new Uint8Array(1);
+                        window.crypto.getRandomValues(array);
+                        return (array[0] % 16).toString(16);
+                    }
+                    const newRoomName = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, getRandomSymbol);
+                    currentUrlSearchParams.set("roomName", newRoomName);
+                    currentUrl.search = currentUrlSearchParams;
+                    window.location.replace(currentUrl.toString());
+                }
+            ''')
+            current_head.insert_after(script_redirect)
+            current_head = script_redirect
+            
+            script_room_connection = soup.new_tag('script')
+            script_room_connection['src'] = os.path.relpath(
+                '/RoomConnection.js',
+                page_url,
+            )
+            current_head.insert_after(script_room_connection)
+            current_head = script_room_connection
+            self.static_files |= set(['RoomConnection.js'])
+            
+            script_room_connection_construction = soup.new_tag('script')
+            script_room_connection_construction.append(
+                'const roomConnection = new RoomConnection(currentRoomName);',
+            )
+            soup.body.insert(0, script_room_connection_construction)
 
             for widget in widgets:
                 log.info(f'Processing {widget}...')
-                widget.tag.replace_with(widget.get_replacement())
-                head_comment = soup.find(string=lambda text: isinstance(text, bs4.Comment) and text.string.strip() == 'interactive-widgets')
-                assert head_comment is not None
-                for tag in widget.get_head_prepends():
+                replacement = widget.get_replacement()
+                widget.tag.replace_with(replacement)
+                replacement.insert_after(widget.get_instantiation())
+                for tag in widget.get_dependencies():
                     if tag not in soup.head:
-                        head_comment.insert_before(tag)
-                for tag in widget.get_head_appends():
-                    if tag not in soup.head:
-                        head_comment.insert_before(tag)
-                for tag in reversed(widget.get_body_prepends()):
-                    if tag not in soup.body:
-                        soup.body.insert(0, tag)
-                for tag in widget.get_body_appends():
-                    if tag not in soup.body:
-                        soup.body.append(tag)
-                self.backend_configuration['pages'][page_url]['executors'][widget.name] = widget.get_backend_configuration(
+                        current_head.insert_after(tag)
+                        current_head = tag
+                self.backend_configuration['pages'][str(page_url)]['executors'][widget.name] = widget.get_backend_configuration(
                 )
                 self.static_files |= set(widget.get_static_files())
+            
+            script_room_connection_ready = soup.new_tag('script')
+            script_room_connection_ready.append(
+                'roomConnection.readyForConnecting();',
+            )
+            soup.body.append(script_room_connection_ready)
 
             return soup.encode_contents(formatter='html5').decode()
 

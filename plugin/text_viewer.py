@@ -34,7 +34,6 @@ class TextViewerWidget(Widget):
 
     def get_static_files(self):
         return [
-            'RoomConnection.js',
             'TextViewerWidget.js',
             'node_modules/codemirror/addon',
             'node_modules/codemirror/keymap',
@@ -43,10 +42,7 @@ class TextViewerWidget(Widget):
             'node_modules/codemirror/theme',
         ]
 
-    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
-        script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/RoomConnection.js')
-
+    def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/TextViewerWidget.js')
 
@@ -68,8 +64,7 @@ class TextViewerWidget(Widget):
                 f'/node_modules/codemirror/mode/{self.mode}/{self.mode}.js',
             )
 
-        return super().get_head_prepends() + [
-            script_room_connection,
+        return [
             script_widget,
             script_codemirror,
             style_codemirror,
@@ -80,18 +75,28 @@ class TextViewerWidget(Widget):
         div['id'] = f'widget-text-viewer-{self.name}'
         return div
 
-    def get_body_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_instantiation(self) -> bs4.element.Tag:
         script = self.soup.new_tag('script')
         mode_parameter = f'"{self._sanitize_javascript(self.mode)}"' if self.mode is not None else 'null'
-        script.append(
-            f'''roomConnection.subscribe("{self.name}", new TextViewerWidget(
-                document.getElementById("widget-text-viewer-{self.name}"),
-                roomConnection.getSendMessageCallback("{self.name}"),
-                "{self._sanitize_javascript(self.file)}",
-                {mode_parameter},
-            ));''',
-        )
-        return [script]
+        script.append(f'''
+            {{
+                roomConnection.addWidget();
+                const widget = new TextViewerWidget(
+                    document.getElementById("widget-text-viewer-{self.name}"),
+                    "{self._sanitize_javascript(self.file)}",
+                    {mode_parameter},
+                );
+                widget.addEventListener("ready", function _listener() {{
+                    roomConnection.markWidgetReady();
+                    widget.removeEventListener("ready", _listener);
+                }});
+                roomConnection.addEventListener("{self.name}", event => {{
+                    widget.handleMessage(event.detail);
+                }});
+                widget.start();
+            }}
+        ''')
+        return script
 
     def get_backend_configuration(self) -> dict:
         return {

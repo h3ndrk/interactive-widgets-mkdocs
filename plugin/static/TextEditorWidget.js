@@ -1,15 +1,20 @@
-class TextEditorWidget {
-  constructor(element, sendMessage, file, mode) {
+class TextEditorWidget extends EventTarget {
+  constructor(element, file, mode) {
+    super();
     this.element = element;
-    this.sendMessage = sendMessage;
     this.file = file;
     this.mode = mode;
     this.stdoutBuffer = "";
     this.open = false;
     this.running = false;
     this.hasContents = false;
-    this.setupUi();
   }
+
+  start() {
+    this.setupUi();
+    this.dispatchEvent(new Event("ready"));
+  }
+
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
@@ -25,11 +30,13 @@ class TextEditorWidget {
     this.buttonCreateElement.innerText = "Create/Empty";
     this.buttonCreateElement.addEventListener("click", () => {
       if (this.open) {
-        this.sendMessage({
-          stdin: btoa(JSON.stringify({
-            contents: "",
-          }) + "\n"),
-        });
+        this.dispatchEvent(new CustomEvent("message", {
+          detail: {
+            stdin: btoa(JSON.stringify({
+              contents: "",
+            }) + "\n"),
+          },
+        }));
         this.running = true;
         this.updateDisabled();
       }
@@ -45,11 +52,13 @@ class TextEditorWidget {
     this.buttonSaveElement.innerText = "Save";
     this.buttonSaveElement.addEventListener("click", () => {
       if (this.open) {
-        this.sendMessage({
-          stdin: btoa(JSON.stringify({
-            contents: btoa(this.editor.getValue()),
-          }) + "\n"),
-        });
+        this.dispatchEvent(new CustomEvent("message", {
+          detail: {
+            stdin: btoa(JSON.stringify({
+              contents: btoa(this.editor.getValue()),
+            }) + "\n"),
+          },
+        }));
         this.running = true;
         this.updateDisabled();
       }
@@ -65,11 +74,13 @@ class TextEditorWidget {
     this.buttonDeleteElement.innerText = "Delete";
     this.buttonDeleteElement.addEventListener("click", () => {
       if (this.open) {
-        this.sendMessage({
-          stdin: btoa(JSON.stringify({
-            delete: true,
-          }) + "\n"),
-        });
+        this.dispatchEvent(new CustomEvent("message", {
+          detail: {
+            stdin: btoa(JSON.stringify({
+              delete: true,
+            }) + "\n"),
+          },
+        }));
         this.running = true;
         this.updateDisabled();
       }
@@ -113,6 +124,7 @@ class TextEditorWidget {
     this.captionElement.classList.add("interactive-widgets-caption");
     this.captionElement.innerText = `Editing text of ${this.file}`;
   }
+
   setupError(error) {
     this.running = false;
     this.hasContents = false;
@@ -121,6 +133,7 @@ class TextEditorWidget {
     this.errorElement.classList.add("show");
     this.spanElement.innerText = atob(error);
   }
+
   setupContents(contents) {
     this.running = false;
     this.hasContents = true;
@@ -130,20 +143,24 @@ class TextEditorWidget {
     this.editor.setValue(atob(contents));
     this.editor.refresh();
   }
+
   handleOpen() {
     this.open = true;
     this.updateDisabled();
   }
+
   handleClose() {
     this.open = false;
     this.updateDisabled();
   }
+
   updateDisabled() {
     this.buttonCreateElement.disabled = !this.open || this.running;
     this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
     this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
     this.editor.setOption("readOnly", !this.open || this.running);
   }
+
   handleMessage(message) {
     if (message.type != "output") {
       console.warn("Message type not implemented:", message);

@@ -1,13 +1,17 @@
-class ImageViewerWidget {
-  constructor(element, sendMessage, file, mime) {
+class ImageViewerWidget extends EventTarget {
+  constructor(element, file, mime) {
+    super();
     this.element = element;
-    this.sendMessage = sendMessage;
     this.file = file;
     this.mime = mime;
     this.stdoutBuffer = "";
-    this.open = false;
-    this.setupUi();
   }
+
+  start() {
+    this.setupUi();
+    this.dispatchEvent(new Event("ready"));
+  }
+
   setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
@@ -41,23 +45,18 @@ class ImageViewerWidget {
     this.captionElement.classList.add("interactive-widgets-caption");
     this.captionElement.innerText = `Viewing image from ${this.file}`;
   }
+
   setupError(error) {
     this.boxElement.style.backgroundImage = "none";
     this.errorElement.classList.add("show");
     this.spanElement.innerText = atob(error);
   }
+
   setupContents(contents) {
     this.errorElement.classList.remove("show");
     this.boxElement.style.backgroundImage = `url(data:${this.mime};base64,${contents})`;
   }
-  handleOpen() {
-    this.open = true;
-    this.element.classList.add("open");
-  }
-  handleClose() {
-    this.open = false;
-    this.element.classList.remove("open");
-  }
+
   handleMessage(message) {
     if (message.type != "output") {
       console.warn("Message type not implemented:", message);

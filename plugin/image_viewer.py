@@ -34,36 +34,39 @@ class ImageViewerWidget(Widget):
         return f'ImageViewerWidget(name={repr(self.name)}, file={repr(self.file)}, mime={repr(self.mime)})'
 
     def get_static_files(self):
-        return ['RoomConnection.js', 'ImageViewerWidget.js']
+        return ['ImageViewerWidget.js']
 
-    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
-        script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/RoomConnection.js')
-
+    def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/ImageViewerWidget.js')
-
-        return super().get_head_prepends() + [
-            script_room_connection,
-            script_widget,
-        ]
+        return [script_widget]
 
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')
         div['id'] = f'widget-image-viewer-{self.name}'
         return div
 
-    def get_body_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_instantiation(self) -> bs4.element.Tag:
         script = self.soup.new_tag('script')
-        script.append(
-            f'''roomConnection.subscribe("{self.name}", new ImageViewerWidget(
-                document.getElementById("widget-image-viewer-{self.name}"),
-                roomConnection.getSendMessageCallback("{self.name}"),
-                "{self._sanitize_javascript(self.file)}",
-                "{self._sanitize_javascript(self.mime)}",
-            ));''',
-        )
-        return [script]
+        script.append(f'''
+            {{
+                roomConnection.addWidget();
+                const widget = new ImageViewerWidget(
+                    document.getElementById("widget-image-viewer-{self.name}"),
+                    "{self._sanitize_javascript(self.file)}",
+                    "{self._sanitize_javascript(self.mime)}",
+                );
+                widget.addEventListener("ready", function _listener() {{
+                    roomConnection.markWidgetReady();
+                    widget.removeEventListener("ready", _listener);
+                }});
+                roomConnection.addEventListener("{self.name}", event => {{
+                    widget.handleMessage(event.detail);
+                }});
+                widget.start();
+            }}
+        ''')
+        return script
 
     def get_backend_configuration(self) -> dict:
         return {

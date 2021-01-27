@@ -1,15 +1,22 @@
-class RoomConnection {
+class RoomConnection extends EventTarget {
   constructor(roomName) {
+    super();
     this.roomName = roomName;
-    this.subscribers = {};
+    this.pendingLoadingWidgets = 0;
+    this.enableConnecting = false;
     this.messageQueue = [];
     this.disconnectedElement = null;
+    this.webSocket = null;
+  }
+
+  connect() {
     this.webSocket = new WebSocket(this.getWebSocketUrl());
     this.webSocket.addEventListener("open", this.handleOpen.bind(this));
     this.webSocket.addEventListener("message", this.handleMessage.bind(this));
     this.webSocket.addEventListener("close", this.handleClose.bind(this));
     this.webSocket.addEventListener("error", this.handleError.bind(this));
   }
+
   getWebSocketUrl() {
     const webSocketUrl = new URL(window.location);
     if (webSocketUrl.protocol === "https:") {
@@ -25,49 +32,63 @@ class RoomConnection {
     webSocketUrl.search = webSocketUrlParams;
     return webSocketUrl.toString();
   }
+
   handleOpen() {
     this.showConnected();
-    for (const widget of Object.values(this.subscribers)) {
-      widget.handleOpen();
+    this.dispatchEvent(new Event("connect"));
+    for (let message = this.messageQueue.pop(); message !== undefined; message = this.messageQueue.pop()) {
+      this.webSocket.send(JSON.stringify(message));
     }
   }
+
   handleMessage(event) {
-    try {
-      const message = JSON.parse(event.data);
-      this.subscribers[message.executor].handleMessage(message.message);
-    } catch (error) {
-      console.error(error);
-      console.error(event.data);
-    }
+    const message = JSON.parse(event.data);
+    this.dispatchEvent(new CustomEvent(message.executor, { detail: message.message }));
   }
+
   handleClose(event) {
     this.showDisconnected();
     console.warn("WEBSOCKET CLOSED!!11elf", event);
-    for (const widget of Object.values(this.subscribers)) {
-      widget.handleClose();
-    }
+    this.dispatchEvent(new Event("disconnect"));
   }
+
   handleError(event) {
     this.showDisconnected();
     console.error("WEBSOCKET ERROR:", event);
-    for (const widget of Object.values(this.subscribers)) {
-      widget.handleClose();
+    this.dispatchEvent(new Event("disconnect"));
+  }
+
+  addWidget() {
+    this.pendingLoadingWidgets += 1;
+  }
+
+  markWidgetReady() {
+    this.pendingLoadingWidgets -= 1;
+    if (this.enableConnecting && this.pendingLoadingWidgets === 0) {
+      this.connect();
     }
   }
-  subscribe(name, widget) {
-    this.subscribers[name] = widget;
+
+  readyForConnecting() {
+    this.enableConnecting = true;
+    if (this.pendingLoadingWidgets === 0) {
+      this.connect();
+    }
   }
-  sendMessage(message) {
-    this.webSocket.send(JSON.stringify(message));
-  }
-  getSendMessageCallback(name) {
-    return message => {
-      this.sendMessage({
-        executor: name,
-        message: message,
-      });
+
+  sendMessage(executor, message) {
+    const completeMessage = {
+      executor: executor,
+      message: message,
     };
+
+    if (this.webSocket !== null && this.webSocket.readyState === 1) {
+      this.webSocket.send(JSON.stringify(completeMessage));
+    } else {
+      this.messageQueue.push(completeMessage);
+    }
   }
+
   showDisconnected() {
     if (this.disconnectedElement === null) {
       this.disconnectedElement = document.createElement("div");
@@ -96,6 +117,7 @@ class RoomConnection {
       disconnectedSpanElement.innerText = "Connection lost. Please reload.";
     }
   }
+
   showConnected() {
     if (this.disconnectedElement !== null) {
       document.body.removeChild(this.disconnectedElement);

@@ -1,13 +1,15 @@
-class TerminalWidget {
-  constructor(element, sendMessage, command, workingDirectory) {
+class TerminalWidget extends EventTarget {
+  constructor(element, command, workingDirectory) {
+    super();
     this.element = element;
-    this.sendMessage = sendMessage;
     this.command = command;
     this.workingDirectory = workingDirectory;
-    this.open = false;
-    this.size = null;
+  }
+
+  start() {
     this.setupUi();
   }
+
   async setupUi() {
     this.boxElement = document.createElement("div");
     this.element.appendChild(this.boxElement);
@@ -70,11 +72,11 @@ class TerminalWidget {
     this.terminal.open(this.boxElement);
 
     this.terminal.onData(data => {
-      if (this.open) {
-        this.sendMessage({
+      this.dispatchEvent(new CustomEvent("message", {
+        detail: {
           stdin: btoa(data),
-        });
-      }
+        },
+      }));
     });
 
     this.terminal.onTitleChange(title => {
@@ -82,35 +84,22 @@ class TerminalWidget {
     });
 
     this.terminal.onResize(size => {
-      this.size = size;
-      if (this.open) {
-        this.sendMessage({
+      this.dispatchEvent(new CustomEvent("message", {
+        detail: {
           size: size,
-        });
-      }
+        },
+      }));
     });
 
     this.fitAddon.fit();
     window.addEventListener("resize", () => {
       this.fitAddon.fit();
     });
+
+    this.dispatchEvent(new Event("ready"));
   }
-  handleOpen() {
-    this.open = true;
-    this.element.classList.add("open");
-    if (this.size !== null) {
-      this.sendMessage({
-        size: this.size,
-      });
-    }
-  }
-  handleClose() {
-    this.open = false;
-    this.element.classList.remove("open");
-  }
+
   handleMessage(message) {
-    if (this.terminal) {
-      this.terminal.write(atob(message.stdout));
-    }
+    this.terminal.write(atob(message.stdout));
   }
 }

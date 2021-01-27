@@ -29,36 +29,48 @@ class ButtonWidget(Widget):
         return f'ButtonWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, label={repr(self.label)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
-        return ['RoomConnection.js', 'ButtonWidget.js']
+        return ['ButtonWidget.js']
 
-    def get_head_prepends(self) -> typing.List[bs4.element.Tag]:
-        script_room_connection = self.soup.new_tag('script')
-        script_room_connection['src'] = self._relative('/RoomConnection.js')
-
+    def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/ButtonWidget.js')
-
-        return super().get_head_prepends() + [
-            script_room_connection,
-            script_widget,
-        ]
+        return [script_widget]
 
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')
         div['id'] = f'widget-button-{self.name}'
         return div
 
-    def get_body_appends(self) -> typing.List[bs4.element.Tag]:
+    def get_instantiation(self) -> bs4.element.Tag:
         script = self.soup.new_tag('script')
-        script.append(
-            f'''roomConnection.subscribe("{self.name}", new ButtonWidget(
-                document.getElementById("widget-button-{self.name}"),
-                roomConnection.getSendMessageCallback("{self.name}"),
-                "{self._sanitize_javascript(self.command)}",
-                "{self._sanitize_javascript(self.label)}",
-            ));''',
-        )
-        return [script]
+        script.append(f'''
+            {{
+                roomConnection.addWidget();
+                const widget = new ButtonWidget(
+                    document.getElementById("widget-button-{self.name}"),
+                    "{self._sanitize_javascript(self.command)}",
+                    "{self._sanitize_javascript(self.label)}",
+                );
+                widget.addEventListener("ready", function _listener() {{
+                    roomConnection.markWidgetReady();
+                    widget.removeEventListener("ready", _listener);
+                }});
+                widget.addEventListener("message", event => {{
+                    roomConnection.sendMessage("{self.name}", event.detail);
+                }});
+                roomConnection.addEventListener("connect", event => {{
+                    widget.handleOpen();
+                }});
+                roomConnection.addEventListener("disconnect", event => {{
+                    widget.handleClose();
+                }});
+                roomConnection.addEventListener("{self.name}", event => {{
+                    widget.handleMessage(event.detail);
+                }});
+                widget.start();
+            }}
+        ''')
+        return script
 
     def get_backend_configuration(self) -> dict:
         configuration = {
