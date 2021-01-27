@@ -84,6 +84,7 @@ class TerminalWidget(Widget):
             f'''roomConnection.subscribe("{self.name}", new TerminalWidget(
                 document.getElementById("widget-terminal-{self.name}"),
                 roomConnection.getSendMessageCallback("{self.name}"),
+                "{self._sanitize_javascript(self.command)}",
                 "{self._sanitize_javascript(self.working_directory)}",
             ));''',
         )
