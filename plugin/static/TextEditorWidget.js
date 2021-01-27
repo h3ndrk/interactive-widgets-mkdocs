@@ -31,9 +31,7 @@ class TextEditorWidget {
           }) + "\n"),
         });
         this.running = true;
-        this.buttonCreateElement.disabled = !this.open || this.running;
-        this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
-        this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+        this.updateDisabled();
       }
     });
 
@@ -53,9 +51,7 @@ class TextEditorWidget {
           }) + "\n"),
         });
         this.running = true;
-        this.buttonCreateElement.disabled = !this.open || this.running;
-        this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
-        this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+        this.updateDisabled();
       }
     });
 
@@ -75,9 +71,7 @@ class TextEditorWidget {
           }) + "\n"),
         });
         this.running = true;
-        this.buttonCreateElement.disabled = !this.open || this.running;
-        this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
-        this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+        this.updateDisabled();
       }
     });
 
@@ -122,9 +116,7 @@ class TextEditorWidget {
   setupError(error) {
     this.running = false;
     this.hasContents = false;
-    this.buttonCreateElement.disabled = !this.open || this.running;
-    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
-    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+    this.updateDisabled();
     this.editorElement.classList.remove("show");
     this.errorElement.classList.add("show");
     this.spanElement.innerText = atob(error);
@@ -132,9 +124,7 @@ class TextEditorWidget {
   setupContents(contents) {
     this.running = false;
     this.hasContents = true;
-    this.buttonCreateElement.disabled = !this.open || this.running;
-    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
-    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+    this.updateDisabled();
     this.errorElement.classList.remove("show");
     this.editorElement.classList.add("show");
     this.editor.setValue(atob(contents));
@@ -142,15 +132,17 @@ class TextEditorWidget {
   }
   handleOpen() {
     this.open = true;
-    this.buttonCreateElement.disabled = !this.open || this.running;
-    this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
-    this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+    this.updateDisabled();
   }
   handleClose() {
     this.open = false;
+    this.updateDisabled();
+  }
+  updateDisabled() {
     this.buttonCreateElement.disabled = !this.open || this.running;
     this.buttonSaveElement.disabled = !this.open || this.running || !this.hasContents;
     this.buttonDeleteElement.disabled = !this.open || this.running || !this.hasContents;
+    this.editor.setOption("readOnly", !this.open || this.running);
   }
   handleMessage(message) {
     if (message.type != "output") {
