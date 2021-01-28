@@ -1,17 +1,14 @@
-import binascii
 import bs4
-import hashlib
 import json
 import mkdocs
 import os
 import pathlib
-import re
-import shlex
 import shutil
-import typing
 
 from .button import ButtonWidget
+from .epilogue import EpilogueWidget
 from .image_viewer import ImageViewerWidget
+from .prologue import PrologueWidget
 from .terminal import TerminalWidget
 from .text_editor import TextEditorWidget
 from .text_viewer import TextViewerWidget
@@ -73,7 +70,9 @@ class Plugin(mkdocs.plugins.BasePlugin):
         widgets = [
             {
                 'x-button': ButtonWidget,
+                'x-epilogue': EpilogueWidget,
                 'x-image-viewer': ImageViewerWidget,
+                'x-prologue': PrologueWidget,
                 'x-terminal': TerminalWidget,
                 'x-text-editor': TextEditorWidget,
                 'x-text-viewer': TextViewerWidget,
@@ -86,7 +85,9 @@ class Plugin(mkdocs.plugins.BasePlugin):
             )
             for index, tag in enumerate(soup.find_all([
                 'x-button',
+                'x-epilogue',
                 'x-image-viewer',
+                'x-prologue',
                 'x-terminal',
                 'x-text-editor',
                 'x-text-viewer',
@@ -102,10 +103,11 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 'logger_name_room': f'{self.config["backend_type"].capitalize()}Room',
                 'executors': {},
             }
-            
-            current_head = soup.find(string=lambda text: isinstance(text, bs4.Comment) and text.string.strip() == 'interactive-widgets')
+
+            current_head = soup.find(string=lambda text: isinstance(
+                text, bs4.Comment) and text.string.strip() == 'interactive-widgets')
             assert current_head is not None
-            
+
             script_redirect = soup.new_tag('script')
             script_redirect.append('''
                 const currentUrl = new URL(window.location);
@@ -132,7 +134,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
             ''')
             current_head.insert_after(script_redirect)
             current_head = script_redirect
-            
+
             script_room_connection = soup.new_tag('script')
             script_room_connection['src'] = os.path.relpath(
                 '/RoomConnection.js',
@@ -141,7 +143,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
             current_head.insert_after(script_room_connection)
             current_head = script_room_connection
             self.static_files |= set(['RoomConnection.js'])
-            
+
             script_room_connection_construction = soup.new_tag('script')
             script_room_connection_construction.append(
                 'const roomConnection = new RoomConnection(currentRoomName);',
@@ -160,7 +162,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 self.backend_configuration['pages'][str(page_url)]['executors'][widget.name] = widget.get_backend_configuration(
                 )
                 self.static_files |= set(widget.get_static_files())
-            
+
             script_room_connection_ready = soup.new_tag('script')
             script_room_connection_ready.append(
                 'roomConnection.readyForConnecting();',
