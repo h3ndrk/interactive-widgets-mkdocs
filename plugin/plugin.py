@@ -42,7 +42,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
          mkdocs.config.config_options.Type(float, default=5.0)),
     )
 
-    def on_config(self, config: mkdocs.config.base.Config, *args, **kwargs):
+    def on_config(self, config: mkdocs.config.base.Config, *args, **kwargs) -> mkdocs.config.base.Config:
         config['site_dir_parent'] = pathlib.Path(config['site_dir'])
         config['site_dir'] = pathlib.Path(config['site_dir']) / 'static'
         return config
