@@ -19,7 +19,7 @@ setuptools.setup(
     ],
     entry_points={
         'mkdocs.plugins': [
-            'interactive_widgets = plugin.plugin:Plugin',
+            'interactive_widgets = interactive_widgets_mkdocs.plugin:Plugin',
         ],
     },
     include_package_data=True,
