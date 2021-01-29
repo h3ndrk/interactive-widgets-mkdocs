@@ -20,7 +20,7 @@ For all `backend_*`-options, see [interactive-widgets-backend for documentation]
 
 ## HTML Tag Reference
 
-The following HTML tags can be used in any Markdown page processed with the *interactive-widgets-mkdocs* plugin. Special characters within HTML tag attributes need to be escaped, see [OWASP XSS Prevention RULE 2](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#rule-2-attribute-encode-before-inserting-untrusted-data-into-html-common-attributes). Symptomes of lacking escaping may be missing page contents.
+The following HTML tags can be used in any Markdown page processed with the *interactive-widgets-mkdocs* plugin. Special characters within HTML tag attributes need to be escaped. Symptomes of lacking escaping may be missing page contents.
 
 ### `<x-button />`
 
