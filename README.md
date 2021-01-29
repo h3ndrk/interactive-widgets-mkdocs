@@ -16,8 +16,6 @@ See the [MkDocs documentation about how to use plugins](https://www.mkdocs.org/u
 - `backend_monitor_default_success_timeout` (type: `float`, default: `0.1`): Success timeout in seconds for monitor containers in backend for `interactive-widgets-backend.json`
 - `backend_monitor_default_failure_timeout` (type: `float`, default: `5.0`): Failure timeout in seconds for monitor containers in backend for `interactive-widgets-backend.json`
 
-For all `backend_*`-options, see [interactive-widgets-backend for documentation](https://github.com/h3ndrk/interactive-widgets-backend/).
-
 ## HTML Tag Reference
 
 The following HTML tags can be used in any Markdown page processed with the *interactive-widgets-mkdocs* plugin. Special characters within HTML tag attributes need to be escaped. Symptomes of lacking escaping may be missing page contents.
