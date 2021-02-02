@@ -1,1 +1,1 @@
-recursive-include plugin/static *
+recursive-include interactive_widgets_mkdocs/static *

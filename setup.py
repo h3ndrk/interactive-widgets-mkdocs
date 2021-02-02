@@ -5,7 +5,7 @@ import setuptools.command.build_py
 class NpmInstall(setuptools.command.build_py.build_py):
 
     def run(self):
-        self.spawn(['npm', 'ci', '--prefix', 'plugin/static'])
+        self.spawn(['npm', 'ci', '--prefix', 'interactive_widgets_mkdocs/static'])
         super().run()
 
 
