@@ -20,7 +20,8 @@ log = mkdocs.plugins.log.getChild('interactive-widgets')
 class Plugin(mkdocs.plugins.BasePlugin):
 
     config_scheme = (
-        ('nginx_server_name', mkdocs.config.config_options.Type(str, default='localhost')),
+        ('nginx_server_name', mkdocs.config.config_options.Type(
+            str, default='localhost')),
         ('nginx_port_http', mkdocs.config.config_options.Type(int, default=80)),
         ('nginx_port_https', mkdocs.config.config_options.Type(int, default=443)),
         ('nginx_https_certificate', mkdocs.config.config_options.Type(str, default=None)),
@@ -158,7 +159,9 @@ class Plugin(mkdocs.plugins.BasePlugin):
             for widget in widgets:
                 log.info(f'Processing {widget}...')
                 replacement = widget.get_replacement()
-                widget.tag.replace_with(replacement)
+                tag_to_replace = widget.tag.parent
+                assert tag_to_replace.name == 'p'
+                tag_to_replace.replace_with(replacement)
                 replacement.insert_after(widget.get_instantiation())
                 for tag in widget.get_dependencies():
                     if tag not in soup.head:
@@ -212,7 +215,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 print('}', file=f)
             print('server {', file=f)
             print('    listen       80;', file=f)
-            print(f'    server_name  {self.config["nginx_server_name"]};', file=f)
+            print(
+                f'    server_name  {self.config["nginx_server_name"]};', file=f)
             print('    location / {', file=f)
             print('        root /usr/share/nginx/html;', file=f)
             print('        index index.html index.htm;', file=f)
@@ -233,7 +237,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 print('    listen       443 ssl;', file=f)
                 print(f'    ssl_certificate /tmp/nginx.crt;', file=f)
                 print(f'    ssl_certificate_key /tmp/nginx.key;', file=f)
-                print(f'    server_name  {self.config["nginx_server_name"]};', file=f)
+                print(
+                    f'    server_name  {self.config["nginx_server_name"]};', file=f)
                 print('    location / {', file=f)
                 print('        root /usr/share/nginx/html;', file=f)
                 print('        index index.html index.htm;', file=f)

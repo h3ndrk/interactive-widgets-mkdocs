@@ -13,6 +13,7 @@ class PrologueWidget(Widget):
         super().__init__(config, url, soup, index, tag)
         self.command = self.tag['command']
         self.image = self.tag['image']
+        self.hidden = self.tag.has_attr('hidden')
         self.working_directory = self.tag.get('working-directory', None)
         self.name = self._hash_inputs(
             'button',
@@ -24,7 +25,7 @@ class PrologueWidget(Widget):
         )
 
     def __str__(self) -> str:
-        return f'PrologueWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, working_directory={repr(self.working_directory)})'
+        return f'PrologueWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, hidden={repr(self.hidden)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
         return ['PrologueWidget.js']
@@ -47,6 +48,7 @@ class PrologueWidget(Widget):
                 const widget = new PrologueWidget(
                     document.getElementById("widget-prologue-{self.name}"),
                     "{self._sanitize_javascript(self.command)}",
+                    {"true" if self.hidden else "false"},
                 );
                 widget.addEventListener("ready", function _listener() {{
                     roomConnection.markWidgetReady();
