@@ -49,7 +49,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
         ('backend_default_memory_limit_bytes',
          mkdocs.config.config_options.Type(int, default=128*1024*1024)),
         ('backend_default_cpu_limit',
-         mkdocs.config.config_options.Type(float, default=0.1)),
+         mkdocs.config.config_options.Type(float, default=1.0)),
         ('backend_default_pids_limit',
          mkdocs.config.config_options.Type(int, default=128)),
     )
