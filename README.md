@@ -45,6 +45,7 @@ Attributes:
 
 - `command`: The command to execute in a new container.
 - `image`: The Docker image to use to start the container from.
+- `hidden` (optional, default `false`): Whether to hide this widget on the web page.
 - `working-directory`: The working directory to execute the given command in.
 
 The frontend shows the given *command*. If the command outputs to the standard output, it will be rendered in the frontend.
@@ -78,6 +79,7 @@ Attributes:
 
 - `command`: The command to execute in a new container.
 - `image`: The Docker image to use to start the container from.
+- `hidden` (optional, default `false`): Whether to hide this widget on the web page.
 - `working-directory`: The working directory to execute the given command in.
 
 The frontend shows the given *command*. If the command outputs to the standard output, it will be rendered in the frontend.
