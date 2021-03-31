@@ -20,7 +20,12 @@ log = mkdocs.plugins.log.getChild('interactive-widgets')
 class Plugin(mkdocs.plugins.BasePlugin):
 
     config_scheme = (
-        ('nginx_port', mkdocs.config.config_options.Type(int, default=80)),
+        ('nginx_server_name', mkdocs.config.config_options.Type(str, default='localhost')),
+        ('nginx_port_http', mkdocs.config.config_options.Type(int, default=80)),
+        ('nginx_port_https', mkdocs.config.config_options.Type(int, default=443)),
+        ('nginx_https_certificate', mkdocs.config.config_options.Type(str, default=None)),
+        ('nginx_https_certificate_key',
+         mkdocs.config.config_options.Type(str, default=None)),
         ('backend_host', mkdocs.config.config_options.Type(str, default='*')),
         ('backend_port', mkdocs.config.config_options.Type(int, default=80)),
         ('backend_type', mkdocs.config.config_options.Type(str, default='docker')),
@@ -207,7 +212,7 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 print('}', file=f)
             print('server {', file=f)
             print('    listen       80;', file=f)
-            print('    server_name  localhost;', file=f)
+            print(f'    server_name  {self.config["nginx_server_name"]};', file=f)
             print('    location / {', file=f)
             print('        root /usr/share/nginx/html;', file=f)
             print('        index index.html index.htm;', file=f)
@@ -223,6 +228,27 @@ class Plugin(mkdocs.plugins.BasePlugin):
                 print('        proxy_set_header Host $host;', file=f)
                 print('    }', file=f)
             print('}', file=f)
+            if self.config['nginx_https_certificate'] is not None and self.config['nginx_https_certificate_key'] is not None:
+                print('server {', file=f)
+                print('    listen       443 ssl;', file=f)
+                print(f'    ssl_certificate /tmp/nginx.crt;', file=f)
+                print(f'    ssl_certificate_key /tmp/nginx.key;', file=f)
+                print(f'    server_name  {self.config["nginx_server_name"]};', file=f)
+                print('    location / {', file=f)
+                print('        root /usr/share/nginx/html;', file=f)
+                print('        index index.html index.htm;', file=f)
+                print('    }', file=f)
+                for page_url in self.backend_configuration['pages'].keys():
+                    websocket_url = pathlib.PurePosixPath(page_url) / 'ws'
+                    proxy_url = f'http://backend{websocket_url}'
+                    print(f'    location = {websocket_url} {{', file=f)
+                    print(f'        proxy_pass {proxy_url};', file=f)
+                    print('        proxy_http_version 1.1;', file=f)
+                    print('        proxy_set_header Upgrade $http_upgrade;', file=f)
+                    print('        proxy_set_header Connection "Upgrade";', file=f)
+                    print('        proxy_set_header Host $host;', file=f)
+                    print('    }', file=f)
+                print('}', file=f)
 
         log.info('Writing Dockerfile...')
         with (config['site_dir_parent'] / 'Dockerfile').open('w') as f:
@@ -240,7 +266,14 @@ class Plugin(mkdocs.plugins.BasePlugin):
             print('    image: interactive-widgets-nginx', file=f)
             print('    build: .', file=f)
             print('    ports:', file=f)
-            print(f'    - "{self.config["nginx_port"]}:80"', file=f)
+            print(f'    - "{self.config["nginx_port_http"]}:80"', file=f)
+            if self.config['nginx_https_certificate'] is not None and self.config['nginx_https_certificate_key'] is not None:
+                print(f'    - "{self.config["nginx_port_https"]}:443"', file=f)
+                print('    volumes:', file=f)
+                print(
+                    f'      - "{self.config["nginx_https_certificate"]}:/tmp/nginx.crt"', file=f)
+                print(
+                    f'      - "{self.config["nginx_https_certificate_key"]}:/tmp/nginx.key"', file=f)
             if len(self.backend_configuration['pages']) > 0:
                 print('  interactive-widgets-backend:', file=f)
                 print('    image: interactive-widgets-backend', file=f)
