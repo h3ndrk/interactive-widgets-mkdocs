@@ -35,10 +35,12 @@ class PrologueWidget(Widget):
         script_widget['src'] = self._relative('/PrologueWidget.js')
         return [script_widget]
 
-    def get_replacement(self) -> bs4.element.Tag:
-        div = self.soup.new_tag('div')
-        div['id'] = f'widget-prologue-{self.name}'
-        return div
+    def get_replacement(self) -> typing.Optional[bs4.element.Tag]:
+        if not self.hidden:
+            div = self.soup.new_tag('div')
+            div['id'] = f'widget-prologue-{self.name}'
+            div['class'] = 'interactive-widgets-container'
+            return div
 
     def get_instantiation(self) -> bs4.element.Tag:
         script = self.soup.new_tag('script')

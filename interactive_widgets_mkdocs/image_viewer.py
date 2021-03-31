@@ -44,6 +44,7 @@ class ImageViewerWidget(Widget):
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')
         div['id'] = f'widget-image-viewer-{self.name}'
+        div['class'] = 'interactive-widgets-container'
         return div
 
     def get_instantiation(self) -> bs4.element.Tag:

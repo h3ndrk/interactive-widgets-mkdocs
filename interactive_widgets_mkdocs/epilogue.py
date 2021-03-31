@@ -13,6 +13,7 @@ class EpilogueWidget(Widget):
         super().__init__(config, url, soup, index, tag)
         self.command = self.tag['command']
         self.image = self.tag['image']
+        self.hidden = self.tag.has_attr('hidden')
         self.working_directory = self.tag.get('working-directory', None)
         self.name = self._hash_inputs(
             'button',
@@ -24,7 +25,7 @@ class EpilogueWidget(Widget):
         )
 
     def __str__(self) -> str:
-        return f'EpilogueWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, working_directory={repr(self.working_directory)})'
+        return f'EpilogueWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, hidden={repr(self.hidden)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
         return ['EpilogueWidget.js']
@@ -34,10 +35,12 @@ class EpilogueWidget(Widget):
         script_widget['src'] = self._relative('/EpilogueWidget.js')
         return [script_widget]
 
-    def get_replacement(self) -> bs4.element.Tag:
-        div = self.soup.new_tag('div')
-        div['id'] = f'widget-epilogue-{self.name}'
-        return div
+    def get_replacement(self) -> typing.Optional[bs4.element.Tag]:
+        if not self.hidden:
+            div = self.soup.new_tag('div')
+            div['id'] = f'widget-epilogue-{self.name}'
+            div['class'] = 'interactive-widgets-container'
+            return div
 
     def get_instantiation(self) -> bs4.element.Tag:
         script = self.soup.new_tag('script')
@@ -47,6 +50,7 @@ class EpilogueWidget(Widget):
                 const widget = new EpilogueWidget(
                     document.getElementById("widget-epilogue-{self.name}"),
                     "{self._sanitize_javascript(self.command)}",
+                    {"true" if self.hidden else "false"},
                 );
                 widget.addEventListener("ready", function _listener() {{
                     roomConnection.markWidgetReady();

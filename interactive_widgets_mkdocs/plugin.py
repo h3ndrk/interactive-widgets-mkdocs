@@ -159,10 +159,14 @@ class Plugin(mkdocs.plugins.BasePlugin):
             for widget in widgets:
                 log.info(f'Processing {widget}...')
                 replacement = widget.get_replacement()
-                tag_to_replace = widget.tag.parent
-                assert tag_to_replace.name == 'p'
-                tag_to_replace.replace_with(replacement)
-                replacement.insert_after(widget.get_instantiation())
+                parent_tag = widget.tag.parent
+                assert parent_tag.name == 'p'
+                if replacement is not None:
+                    parent_tag.replace_with(replacement)
+                    replacement.insert_after(widget.get_instantiation())
+                else:
+                    parent_tag.insert_after(widget.get_instantiation())
+                    parent_tag.extract()
                 for tag in widget.get_dependencies():
                     if tag not in soup.head:
                         current_head.insert_after(tag)
