@@ -46,6 +46,12 @@ class Plugin(mkdocs.plugins.BasePlugin):
          mkdocs.config.config_options.Type(float, default=0.1)),
         ('backend_monitor_default_failure_timeout',
          mkdocs.config.config_options.Type(float, default=5.0)),
+        ('backend_default_memory_limit_bytes',
+         mkdocs.config.config_options.Type(int, default=128*1024*1024)),
+        ('backend_default_cpu_limit',
+         mkdocs.config.config_options.Type(float, default=0.1)),
+        ('backend_default_pids_limit',
+         mkdocs.config.config_options.Type(int, default=128)),
     )
 
     def on_config(self, config: mkdocs.config.base.Config, *args, **kwargs) -> mkdocs.config.base.Config:

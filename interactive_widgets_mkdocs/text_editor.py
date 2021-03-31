@@ -20,6 +20,12 @@ class TextEditorWidget(Widget):
             'failure-timeout',
             str(self.config['backend_monitor_default_failure_timeout']),
         )
+        self.memory_limit_bytes = self.tag.get(
+            'memory-limit-bytes', self.config['backend_default_memory_limit_bytes'])
+        self.cpu_limit = self.tag.get(
+            'cpu-limit', self.config['backend_default_cpu_limit'])
+        self.pids_limit = self.tag.get(
+            'pids-limit', self.config['backend_default_pids_limit'])
         self.name = self._hash_inputs(
             'text-editor',
             str(self.url),
@@ -119,4 +125,7 @@ class TextEditorWidget(Widget):
                 self.success_timeout,
                 self.failure_timeout,
             ],
+            'memory_limit_bytes': self.memory_limit_bytes,
+            'cpu_limit': self.cpu_limit,
+            'pids_limit': self.pids_limit,
         }

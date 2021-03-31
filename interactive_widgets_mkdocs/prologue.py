@@ -15,6 +15,12 @@ class PrologueWidget(Widget):
         self.image = self.tag['image']
         self.hidden = self.tag.has_attr('hidden')
         self.working_directory = self.tag.get('working-directory', None)
+        self.memory_limit_bytes = self.tag.get(
+            'memory-limit-bytes', self.config['backend_default_memory_limit_bytes'])
+        self.cpu_limit = self.tag.get(
+            'cpu-limit', self.config['backend_default_cpu_limit'])
+        self.pids_limit = self.tag.get(
+            'pids-limit', self.config['backend_default_pids_limit'])
         self.name = self._hash_inputs(
             'button',
             str(self.url),
@@ -70,6 +76,9 @@ class PrologueWidget(Widget):
             'logger_name': f'{self.config["backend_type"].capitalize()}Prologue',
             'image': self.image,
             'command': shlex.split(self.command),
+            'memory_limit_bytes': self.memory_limit_bytes,
+            'cpu_limit': self.cpu_limit,
+            'pids_limit': self.pids_limit,
         }
         if self.working_directory is not None:
             configuration['working_directory'] = self.working_directory
