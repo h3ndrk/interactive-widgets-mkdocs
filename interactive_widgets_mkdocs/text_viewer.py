@@ -41,6 +41,7 @@ class TextViewerWidget(Widget):
     def get_static_files(self):
         return [
             'TextViewerWidget.js',
+            'Widget.js',
             'node_modules/codemirror/addon',
             'node_modules/codemirror/keymap',
             'node_modules/codemirror/lib',
@@ -51,6 +52,9 @@ class TextViewerWidget(Widget):
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
         script_widget['src'] = self._relative('/TextViewerWidget.js')
+
+        script_text_viewer_widget = self.soup.new_tag('script')
+        script_text_viewer_widget['src'] = self._relative('/TextViewerWidget.js')
 
         script_codemirror = self.soup.new_tag('script')
         script_codemirror['src'] = self._relative(
@@ -72,6 +76,7 @@ class TextViewerWidget(Widget):
 
         return [
             script_widget,
+            script_text_viewer_widget,
             script_codemirror,
             style_codemirror,
         ] + script_codemirror_mode

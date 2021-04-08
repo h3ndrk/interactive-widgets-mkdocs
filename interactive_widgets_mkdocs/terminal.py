@@ -35,6 +35,7 @@ class TerminalWidget(Widget):
     def get_static_files(self):
         return [
             'TerminalWidget.js',
+            'Widget.js',
             'node_modules/xterm/lib',
             'node_modules/xterm-addon-fit/lib',
             'node_modules/xterm/css',
@@ -42,7 +43,10 @@ class TerminalWidget(Widget):
 
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/TerminalWidget.js')
+        script_widget['src'] = self._relative('/Widget.js')
+
+        script_terminal_widget = self.soup.new_tag('script')
+        script_terminal_widget['src'] = self._relative('/TerminalWidget.js')
 
         script_xterm = self.soup.new_tag('script')
         script_xterm['src'] = self._relative(
@@ -62,6 +66,7 @@ class TerminalWidget(Widget):
 
         return [
             script_widget,
+            script_terminal_widget,
             script_xterm,
             script_xterm_fit,
             style_xterm,

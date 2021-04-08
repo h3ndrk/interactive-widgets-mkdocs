@@ -1,4 +1,4 @@
-class TextEditorWidget extends EventTarget {
+class TextEditorWidget extends Widget {
   constructor(element, file, mode) {
     super();
     this.element = element;
@@ -32,7 +32,7 @@ class TextEditorWidget extends EventTarget {
       if (this.open) {
         this.dispatchEvent(new CustomEvent("message", {
           detail: {
-            stdin: btoa(JSON.stringify({
+            stdin: this.btoa(JSON.stringify({
               contents: "",
             }) + "\n"),
           },
@@ -54,8 +54,8 @@ class TextEditorWidget extends EventTarget {
       if (this.open) {
         this.dispatchEvent(new CustomEvent("message", {
           detail: {
-            stdin: btoa(JSON.stringify({
-              contents: btoa(this.editor.getValue()),
+            stdin: this.btoa(JSON.stringify({
+              contents: this.btoa(this.editor.getValue()),
             }) + "\n"),
           },
         }));
@@ -76,7 +76,7 @@ class TextEditorWidget extends EventTarget {
       if (this.open) {
         this.dispatchEvent(new CustomEvent("message", {
           detail: {
-            stdin: btoa(JSON.stringify({
+            stdin: this.btoa(JSON.stringify({
               delete: true,
             }) + "\n"),
           },
@@ -117,7 +117,7 @@ class TextEditorWidget extends EventTarget {
     this.spanElement = document.createElement("span");
     this.errorElement.appendChild(this.spanElement);
 
-    this.setupError(btoa("There is no data"));
+    this.setupError(this.btoa("There is no data"));
 
     this.captionElement = document.createElement("div");
     this.element.appendChild(this.captionElement);
@@ -131,7 +131,7 @@ class TextEditorWidget extends EventTarget {
     this.updateDisabled();
     this.editorElement.classList.remove("show");
     this.errorElement.classList.add("show");
-    this.spanElement.innerText = atob(error);
+    this.spanElement.innerText = this.atob(error);
   }
 
   setupContents(contents) {
@@ -140,7 +140,7 @@ class TextEditorWidget extends EventTarget {
     this.updateDisabled();
     this.errorElement.classList.remove("show");
     this.editorElement.classList.add("show");
-    this.editor.setValue(atob(contents));
+    this.editor.setValue(this.atob(contents));
     this.editor.refresh();
   }
 
@@ -172,7 +172,7 @@ class TextEditorWidget extends EventTarget {
       return;
     }
 
-    this.stdoutBuffer += atob(message.stdout);
+    this.stdoutBuffer += this.atob(message.stdout);
     for (let newlinePosition = this.stdoutBuffer.indexOf("\n"); newlinePosition != -1; newlinePosition = this.stdoutBuffer.indexOf("\n")) {
       const stdoutMessage = JSON.parse(this.stdoutBuffer.slice(0, newlinePosition));
       if ("contents" in stdoutMessage) {

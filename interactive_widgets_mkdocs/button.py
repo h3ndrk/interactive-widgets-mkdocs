@@ -35,12 +35,14 @@ class ButtonWidget(Widget):
         return f'ButtonWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, label={repr(self.label)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
-        return ['ButtonWidget.js']
+        return ['ButtonWidget.js', 'Widget.js']
 
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/ButtonWidget.js')
-        return [script_widget]
+        script_widget['src'] = self._relative('/Widget.js')
+        script_button_widget = self.soup.new_tag('script')
+        script_button_widget['src'] = self._relative('/ButtonWidget.js')
+        return [script_widget, script_button_widget]
 
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')

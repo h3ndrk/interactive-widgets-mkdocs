@@ -1,4 +1,4 @@
-class TextViewerWidget extends EventTarget {
+class TextViewerWidget extends Widget {
   constructor(element, file, mode) {
     super();
     this.element = element;
@@ -49,7 +49,7 @@ class TextViewerWidget extends EventTarget {
     this.spanElement = document.createElement("span");
     this.errorElement.appendChild(this.spanElement);
 
-    this.setupError(btoa("There is no data"));
+    this.setupError(this.btoa("There is no data"));
 
     this.captionElement = document.createElement("div");
     this.element.appendChild(this.captionElement);
@@ -60,13 +60,13 @@ class TextViewerWidget extends EventTarget {
   setupError(error) {
     this.viewerElement.classList.remove("show");
     this.errorElement.classList.add("show");
-    this.spanElement.innerText = atob(error);
+    this.spanElement.innerText = this.atob(error);
   }
 
   setupContents(contents) {
     this.viewerElement.classList.add("show");
     this.errorElement.classList.remove("show");
-    this.editor.setValue(atob(contents));
+    this.editor.setValue(this.atob(contents));
     this.editor.refresh();
   }
 
@@ -81,7 +81,7 @@ class TextViewerWidget extends EventTarget {
       return;
     }
 
-    this.stdoutBuffer += atob(message.stdout);
+    this.stdoutBuffer += this.atob(message.stdout);
     for (let newlinePosition = this.stdoutBuffer.indexOf("\n"); newlinePosition != -1; newlinePosition = this.stdoutBuffer.indexOf("\n")) {
       const stdoutMessage = JSON.parse(this.stdoutBuffer.slice(0, newlinePosition));
       if ("contents" in stdoutMessage) {

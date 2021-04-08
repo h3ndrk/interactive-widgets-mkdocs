@@ -41,6 +41,7 @@ class TextEditorWidget(Widget):
     def get_static_files(self):
         return [
             'TextEditorWidget.js',
+            'Widget.js',
             'node_modules/codemirror/addon',
             'node_modules/codemirror/keymap',
             'node_modules/codemirror/lib',
@@ -50,7 +51,10 @@ class TextEditorWidget(Widget):
 
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/TextEditorWidget.js')
+        script_widget['src'] = self._relative('/Widget.js')
+
+        script_text_editor_widget = self.soup.new_tag('script')
+        script_text_editor_widget['src'] = self._relative('/TextEditorWidget.js')
 
         script_codemirror = self.soup.new_tag('script')
         script_codemirror['src'] = self._relative(
@@ -72,6 +76,7 @@ class TextEditorWidget(Widget):
 
         return [
             script_widget,
+            script_text_editor_widget,
             script_codemirror,
             style_codemirror,
         ] + script_codemirror_mode

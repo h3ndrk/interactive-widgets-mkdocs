@@ -34,12 +34,14 @@ class PrologueWidget(Widget):
         return f'PrologueWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, hidden={repr(self.hidden)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
-        return ['PrologueWidget.js']
+        return ['PrologueWidget.js', 'Widget.js']
 
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/PrologueWidget.js')
-        return [script_widget]
+        script_widget['src'] = self._relative('/Widget.js')
+        script_prologue_widget = self.soup.new_tag('script')
+        script_prologue_widget['src'] = self._relative('/PrologueWidget.js')
+        return [script_widget, script_prologue_widget]
 
     def get_replacement(self) -> typing.Optional[bs4.element.Tag]:
         if not self.hidden:

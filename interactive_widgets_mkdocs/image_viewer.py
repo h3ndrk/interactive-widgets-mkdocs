@@ -40,12 +40,14 @@ class ImageViewerWidget(Widget):
         return f'ImageViewerWidget(name={repr(self.name)}, file={repr(self.file)}, mime={repr(self.mime)})'
 
     def get_static_files(self):
-        return ['ImageViewerWidget.js']
+        return ['ImageViewerWidget.js', 'Widget.js']
 
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/ImageViewerWidget.js')
-        return [script_widget]
+        script_widget['src'] = self._relative('/Widget.js')
+        script_image_viewer_widget = self.soup.new_tag('script')
+        script_image_viewer_widget['src'] = self._relative('/ImageViewerWidget.js')
+        return [script_widget, script_image_viewer_widget]
 
     def get_replacement(self) -> bs4.element.Tag:
         div = self.soup.new_tag('div')

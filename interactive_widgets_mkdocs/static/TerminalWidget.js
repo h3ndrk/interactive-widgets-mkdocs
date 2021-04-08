@@ -1,4 +1,4 @@
-class TerminalWidget extends EventTarget {
+class TerminalWidget extends Widget {
   constructor(element, command, workingDirectory) {
     super();
     this.element = element;
@@ -74,7 +74,7 @@ class TerminalWidget extends EventTarget {
     this.terminal.onData(data => {
       this.dispatchEvent(new CustomEvent("message", {
         detail: {
-          stdin: btoa(data),
+          stdin: this.btoa(data),
         },
       }));
     });
@@ -100,6 +100,6 @@ class TerminalWidget extends EventTarget {
   }
 
   handleMessage(message) {
-    this.terminal.write(atob(message.stdout));
+    this.terminal.write(this.atob(message.stdout));
   }
 }

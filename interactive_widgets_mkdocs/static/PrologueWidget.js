@@ -1,4 +1,4 @@
-class PrologueWidget extends EventTarget {
+class PrologueWidget extends Widget {
   constructor(element, command, hidden) {
     super();
     this.element = element;
@@ -50,14 +50,14 @@ class PrologueWidget extends EventTarget {
             this.outputsElement.classList.add("show");
             const lineElement = document.createElement("div");
             lineElement.classList.add("line", "stdout");
-            lineElement.innerText = atob(message.stdout);
+            lineElement.innerText = this.atob(message.stdout);
             this.outputsElement.appendChild(lineElement);
           } else if ("stderr" in message) {
             this.boxElement.classList.remove("empty");
             this.outputsElement.classList.add("show");
             const lineElement = document.createElement("div");
             lineElement.classList.add("line", "stderr");
-            lineElement.innerText = atob(message.stderr);
+            lineElement.innerText = this.atob(message.stderr);
             this.outputsElement.appendChild(lineElement);
           }
           break;
@@ -70,7 +70,7 @@ class PrologueWidget extends EventTarget {
           this.outputsElement.classList.add("show");
           const errorElement = document.createElement("div");
           errorElement.classList.add("error");
-          errorElement.innerText = atob(message.stdout);
+          errorElement.innerText = this.atob(message.stdout);
           this.outputsElement.appendChild(errorElement);
           break;
         }

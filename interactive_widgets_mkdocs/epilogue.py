@@ -34,12 +34,14 @@ class EpilogueWidget(Widget):
         return f'EpilogueWidget(name={repr(self.name)}, command={repr(self.command)}, image={repr(self.image)}, hidden={repr(self.hidden)}, working_directory={repr(self.working_directory)})'
 
     def get_static_files(self):
-        return ['EpilogueWidget.js']
+        return ['EpilogueWidget.js', 'Widget.js']
 
     def get_dependencies(self) -> typing.List[bs4.element.Tag]:
         script_widget = self.soup.new_tag('script')
-        script_widget['src'] = self._relative('/EpilogueWidget.js')
-        return [script_widget]
+        script_widget['src'] = self._relative('/Widget.js')
+        script_epilogue_widget = self.soup.new_tag('script')
+        script_epilogue_widget['src'] = self._relative('/EpilogueWidget.js')
+        return [script_widget, script_epilogue_widget]
 
     def get_replacement(self) -> typing.Optional[bs4.element.Tag]:
         if not self.hidden:
