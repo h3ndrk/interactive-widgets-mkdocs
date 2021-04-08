@@ -85,12 +85,12 @@ class ButtonWidget extends Widget {
           for (let newlinePosition = this.stderrBuffer.indexOf("\n"); newlinePosition !== -1; newlinePosition = this.stderrBuffer.indexOf("\n")) {
             const currentLine = this.stderrBuffer.substr(0, newlinePosition);
             this.boxElement.classList.remove("empty");
-            this.errputsElement.classList.add("show");
+            this.outputsElement.classList.add("show");
             const lineElement = document.createElement("pre");
             lineElement.classList.add("line", "stderr");
             console.log(currentLine);
             lineElement.innerText = currentLine;
-            this.errputsElement.appendChild(lineElement);
+            this.outputsElement.appendChild(lineElement);
             this.stderrBuffer = this.stderrBuffer.substr(newlinePosition + 1, this.stderrBuffer.length - newlinePosition - 1);
           }
         }
