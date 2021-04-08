@@ -6,6 +6,8 @@ class ButtonWidget extends Widget {
     this.label = label;
     this.open = false;
     this.running = false;
+    this.stdoutBuffer = "";
+    this.stderrBuffer = "";
   }
 
   start() {
@@ -66,19 +68,31 @@ class ButtonWidget extends Widget {
       }
       case "output": {
         if ("stdout" in message) {
-          this.boxElement.classList.remove("empty");
-          this.outputsElement.classList.add("show");
-          const lineElement = document.createElement("div");
-          lineElement.classList.add("line", "stdout");
-          lineElement.innerText = this.atob(message.stdout);
-          this.outputsElement.appendChild(lineElement);
+          this.stdoutBuffer += this.atob(message.stdout);
+          for (let newlinePosition = this.stdoutBuffer.indexOf("\n"); newlinePosition !== -1; newlinePosition = this.stdoutBuffer.indexOf("\n")) {
+            const currentLine = this.stdoutBuffer.substr(0, newlinePosition);
+            this.boxElement.classList.remove("empty");
+            this.outputsElement.classList.add("show");
+            const lineElement = document.createElement("pre");
+            lineElement.classList.add("line", "stdout");
+            console.log(currentLine);
+            lineElement.innerText = currentLine;
+            this.outputsElement.appendChild(lineElement);
+            this.stdoutBuffer = this.stdoutBuffer.substr(newlinePosition + 1, this.stdoutBuffer.length - newlinePosition - 1);
+          }
         } else if ("stderr" in message) {
-          this.boxElement.classList.remove("empty");
-          this.outputsElement.classList.add("show");
-          const lineElement = document.createElement("div");
-          lineElement.classList.add("line", "stderr");
-          lineElement.innerText = this.atob(message.stderr);
-          this.outputsElement.appendChild(lineElement);
+          this.stderrBuffer += this.atob(message.stderr);
+          for (let newlinePosition = this.stderrBuffer.indexOf("\n"); newlinePosition !== -1; newlinePosition = this.stderrBuffer.indexOf("\n")) {
+            const currentLine = this.stderrBuffer.substr(0, newlinePosition);
+            this.boxElement.classList.remove("empty");
+            this.errputsElement.classList.add("show");
+            const lineElement = document.createElement("pre");
+            lineElement.classList.add("line", "stderr");
+            console.log(currentLine);
+            lineElement.innerText = currentLine;
+            this.errputsElement.appendChild(lineElement);
+            this.stderrBuffer = this.stderrBuffer.substr(newlinePosition + 1, this.stderrBuffer.length - newlinePosition - 1);
+          }
         }
         break;
       }
