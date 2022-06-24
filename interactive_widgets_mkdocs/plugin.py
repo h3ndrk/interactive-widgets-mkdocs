@@ -118,6 +118,8 @@ class Plugin(mkdocs.plugins.BasePlugin):
 
             current_head = soup.find(string=lambda text: isinstance(
                 text, bs4.Comment) and text.string.strip() == 'interactive-widgets')
+            if current_head is None:
+                current_head = soup.select('head > *:last-child')[0]
             assert current_head is not None
 
             script_redirect = soup.new_tag('script')
